@@ -1,0 +1,115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.body-div {
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px;
+}
+
+.body-div .titles h2 {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    margin-bottom: 20px;
+}
+
+.body-div .titles h3 {
+    color: #7EB3BF;
+    font-family: Helvetica, sans-serif;
+    margin-bottom: 20px;
+}
+
+.body-div .diagnosis {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .diagnosis p {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.body-div .procedure {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .procedure p {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.body-div .medication {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .medication p {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.body-div .instruction {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .instruction p {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.body-div .doctors-note {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .doctors-note p {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+.body-div .diagnosis-img {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .diagnosis-img img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.body-div .lab-result {
+    color: #3A7D8C;
+    font-family: Helvetica, sans-serif;
+    text-align: justify;
+    margin-bottom: 40px;
+    margin-left: 40px;
+}
+
+.body-div .lab-result p {
+    margin-top: 10px;
+    margin-left: 10px;
+}
