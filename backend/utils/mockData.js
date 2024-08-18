@@ -1,90 +1,53 @@
-const mysql = require("../config/db");
+const mysql = require("../config/db")
 const bcrypt = require("bcryptjs");
 
-const mockData = async () => {
+const seedData = async () => {
   try {
     const hashedPassword = await bcrypt.hash("password123", 10);
 
-    // Insert patients
-    await mysql
-      .promise()
-      .query(
-        "INSERT INTO patients (patient_name, email, password, dob, gender, allergies, contact_info, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          "John Doe",
-          "john@example.com",
-          hashedPassword,
-          "1990-01-01",
-          "Male",
-          "None",
-          "123-456-7890",
-          "123 Main St",
-        ]
-      );
-    await mysql
-      .promise()
-      .query(
-        "INSERT INTO patients (patient_name, email, password, dob, gender, allergies, contact_info, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          "Jane Doe",
-          "jane@example.com",
-          hashedPassword,
-          "1985-05-05",
-          "Female",
-          "Peanuts",
-          "123-456-7891",
-          "456 Maple Ave",
-        ]
-      );
+    // Insert patients into patient_credentials and patients tables
+    await mysql.promise().query(
+      "INSERT INTO patient_credentials (email, password, role) VALUES (?, ?, 'patient')",
+      ['patient1@example.com', hashedPassword]
+    );
+    await mysql.promise().query(
+      "INSERT INTO patients (patient_id, patient_name) VALUES (LAST_INSERT_ID(), 'John Doe')"
+    );
 
-    // Insert staff
-    await mysql
-      .promise()
-      .query(
-        "INSERT INTO staffs (staff_name, email, password, department_id, qualification, salary, job_type, start_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          "Dr. Smith",
-          "drsmith@example.com",
-          hashedPassword,
-          1,
-          "MBBS",
-          80000,
-          "doctor",
-          "2023-01-01",
-        ]
-      );
-    await mysql
-      .promise()
-      .query(
-        "INSERT INTO staffs (staff_name, email, password, department_id, qualification, salary, job_type, start_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          "Manager Mike",
-          "mike@example.com",
-          hashedPassword,
-          2,
-          "MBA",
-          90000,
-          "manager",
-          "2023-02-01",
-        ]
-      );
-    await mysql
-      .promise()
-      .query(
-        "INSERT INTO staffs (staff_name, email, password, department_id, qualification, salary, job_type, start_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [
-          "Admin Alice",
-          "alice@example.com",
-          hashedPassword,
-          3,
-          "BSc Admin",
-          70000,
-          "admin",
-          "2023-03-01",
-        ]
-      );
+    await mysql.promise().query(
+      "INSERT INTO patient_credentials (email, password, role) VALUES (?, ?, 'patient')",
+      ['patient2@example.com', hashedPassword]
+    );
+    await mysql.promise().query(
+      "INSERT INTO patients (patient_id, patient_name) VALUES (LAST_INSERT_ID(), 'Jane Smith')"
+    );
 
-    console.log("Data seeded successfully.");
+    // Insert staff into staff_credentials and staffs tables
+    await mysql.promise().query(
+      "INSERT INTO staff_credentials (email, password, role) VALUES (?, ?, 'doctor')",
+      ['doctor1@example.com', hashedPassword]
+    );
+    await mysql.promise().query(
+      "INSERT INTO staffs (staff_id, staff_name, department_id, manager_id, qualification, salary, job_type) VALUES (LAST_INSERT_ID(), 'Dr. Gregory House', 1, 1, 'MD', 120000, 'doctor')"
+    );
+
+    await mysql.promise().query(
+      "INSERT INTO staff_credentials (email, password, role) VALUES (?, ?, 'manager')",
+      ['manager1@example.com', hashedPassword]
+    );
+    await mysql.promise().query(
+      "INSERT INTO staffs (staff_id, staff_name, department_id, manager_id, qualification, salary, job_type) VALUES (LAST_INSERT_ID(), 'Dr. James Wilson', 1, 1, 'MD', 140000, 'manager')"
+    );
+
+    await mysql.promise().query(
+      "INSERT INTO staff_credentials (email, password, role) VALUES (?, ?, 'admin')",
+      ['admin1@example.com', hashedPassword]
+    );
+    await mysql.promise().query(
+      "INSERT INTO staffs (staff_id, staff_name, department_id, manager_id, qualification, salary, job_type) VALUES (LAST_INSERT_ID(), 'Lisa Cuddy', 1, 1, 'MBA', 160000, 'admin')"
+    );
+
+    console.log("Mock data seeded successfully.");
     process.exit(0);
   } catch (error) {
     console.error("Error seeding data:", error);
@@ -92,4 +55,4 @@ const mockData = async () => {
   }
 };
 
-mockData();
+seedData();

@@ -14,6 +14,7 @@ const RoleRouting = () => {
     // If the user is not authenticated, redirect to the login page
     return <Navigate to="/login" />;
   }
+  console.log("Authenticated Role:", auth.role);
 
   // Redirect based on role
   switch (auth.role) {
