@@ -48,3 +48,10 @@ CREATE TABLE staffs (
     FOREIGN KEY (staff_id) REFERENCES staff_credentials(staff_id)
 
 ) ENGINE=InnoDB;
+
+-- Change for add-doctor function, might be change in the future
+ALTER TABLE staffs MODIFY manager_id INT DEFAULT 1;
+
+
+ALTER TABLE staffs ADD INDEX (department_id);
+ALTER TABLE staff_credentials ADD INDEX (email);

@@ -6,19 +6,16 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
-  const navigate = useNavigate(); // This works only if AuthProvider is inside Router
+  const navigate = useNavigate(); 
 
   const login = async (email, password) => {
     try {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        }
+        { email, password }
       );
 
-      console.log("API response:", response.data); // Check what is being returned
+      console.log("API response:", response.data);
       const { token, role } = response.data;
       setAuth({ token, role });
       localStorage.setItem("authToken", token);
@@ -26,7 +23,7 @@ export const AuthProvider = ({ children }) => {
       // Redirect to dashboard after login
       navigate("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error.response.data); // Provide more detailed error logging
+      console.error("Login failed:", error.response.data);
       throw new Error("Login failed");
     }
   };
@@ -37,8 +34,20 @@ export const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
+  const authAxios = axios.create({
+    baseURL: "http://localhost:5000",
+  });
+
+  authAxios.interceptors.request.use((config) => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout, authAxios }}>
       {children}
     </AuthContext.Provider>
   );
