@@ -53,5 +53,5 @@ CREATE TABLE staffs (
 ALTER TABLE staffs MODIFY manager_id INT DEFAULT 1;
 
 
-ALTER TABLE staffs ADD INDEX (department_id);
-ALTER TABLE staff_credentials ADD INDEX (email);
+-- ALTER TABLE staffs ADD INDEX (department_id);
+-- ALTER TABLE staff_credentials ADD INDEX (email);
