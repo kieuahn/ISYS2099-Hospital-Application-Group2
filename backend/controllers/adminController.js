@@ -14,53 +14,14 @@ exports.getAllStaff = async (req, res) => {
 };
 
 // Add a new doctor
-// exports.addDoctor = async (req, res) => {
-//   const { name, email, department_id, qualification, salary } = req.body;
-//   let connection;
-
-//   try {
-//     connection = await mysql.promise().getConnection();
-//     await connection.beginTransaction();
-
-//     const [existingStaff] = await connection.query("SELECT * FROM staff_credentials WHERE email = ?", [email]);
-
-//     if (existingStaff.length > 0) {
-//       await connection.rollback();
-//       return res.status(400).json({ message: "Email already exists." });
-//     }
-
-//     const hashedPassword = await bcrypt.hash("password123", 10);
-
-//     const [result] = await connection.query(
-//       "INSERT INTO staff_credentials (email, password, role) VALUES (?, ?, 'doctor')",
-//       [email, hashedPassword]
-//     );
-
-//     const staff_id = result.insertId;
-
-//     await connection.query(
-//       "INSERT INTO staffs (staff_id, staff_name, department_id, qualification, salary, job_type) VALUES (?, ?, ?, ?, ?, 'doctor')",
-//       [staff_id, name, department_id, qualification, salary]
-//     );
-
-//     await connection.commit();
-//     res.status(201).json({ message: "Doctor added successfully." });
-//   } catch (error) {
-//     console.error("Error adding doctor:", error.message);
-//     if (connection) await connection.rollback();
-//     res.status(500).json({ message: "Failed to add doctor.", error: error.message });
-//   } finally {
-//     if (connection) connection.release();
-//   }
-// };
-
 exports.addDoctor = async (req, res) => {
-  const { name, email, department_id, qualification, salary } = req.body;
+  const { name, email, department_id, qualification, salary, role } = req.body;
 
   try {
     // Start the transaction
     await mysql.promise().beginTransaction();
 
+    // Check if the email already exists in staff_credentials
     const [existingStaff] = await mysql
       .promise()
       .query("SELECT * FROM staff_credentials WHERE email = ?", [email]);
@@ -70,27 +31,28 @@ exports.addDoctor = async (req, res) => {
       return res.status(400).json({ message: "Email already exists." });
     }
 
-    const hashedPassword = await bcrypt.hash("password123", 10);
-
-    const [result] = await mysql.promise().query(
-      "INSERT INTO staff_credentials (email, password, role) VALUES (?, ?, 'doctor')",
-      [email, hashedPassword]
+    // Insert into the `staffs` table first
+    const [staffResult] = await mysql.promise().query(
+      "INSERT INTO staffs (staff_name, department_id, qualification, salary, job_type) VALUES (?, ?, ?, ?, ?)",
+      [name, department_id, qualification, salary, role]
     );
 
-    const staff_id = result.insertId;
+    const staff_id = staffResult.insertId;
 
+    // Then insert into the `staff_credentials` table using the staff_id
+    const hashedPassword = await bcrypt.hash("password123", 10);
     await mysql.promise().query(
-      "INSERT INTO staffs (staff_id, staff_name, department_id, qualification, salary, job_type) VALUES (?, ?, ?, ?, ?, 'doctor')",
-      [staff_id, name, department_id, qualification, salary]
+      "INSERT INTO staff_credentials (staff_id, email, password, role) VALUES (?, ?, ?, ?)",
+      [staff_id, email, hashedPassword, role]
     );
 
     // Commit the transaction
     await mysql.promise().commit();
-    res.status(201).json({ message: "Doctor added successfully." });
+    res.status(201).json({ message: `${role.charAt(0).toUpperCase() + role.slice(1)} added successfully.` });
   } catch (error) {
     console.error("Error adding doctor:", error.message);
     await mysql.promise().rollback();
-    res.status(500).json({ message: "Failed to add doctor.", error: error.message });
+    res.status(500).json({ message: "Failed to add staff.", error: error.message });
   }
 };
 
@@ -153,25 +115,45 @@ exports.updateStaff = async (req, res) => {
 // Delete staff by ID
 // Delete a staff member
 exports.deleteStaff = async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
 
-  try {
-    // Start transaction
-    await mysql.promise().query("START TRANSACTION");
+    try {
+        // Start transaction
+        await mysql.promise().query("START TRANSACTION");
 
-    // Delete from the staffs table
-    await mysql.promise().query("DELETE FROM staffs WHERE staff_id = ?", [id]);
+        // Delete from the staff_credentials table
+        const [staffCredResult] = await mysql.promise().query("DELETE FROM staff_credentials WHERE staff_id = ?", [id]);
 
-    // Delete from the staff_credentials table
-    await mysql.promise().query("DELETE FROM staff_credentials WHERE staff_id = ?", [id]);
+        if (staffCredResult.affectedRows === 0) {
+            throw new Error('Staff credentials not found');
+        }
 
-    // Commit the transaction
-    await mysql.promise().query("COMMIT");
+        // Delete from the staffs table
+        const [staffResult] = await mysql.promise().query("DELETE FROM staffs WHERE staff_id = ?", [id]);
 
-    res.json({ message: "Staff deleted successfully." });
-  } catch (error) {
-    // Rollback the transaction in case of error
-    await mysql.promise().query("ROLLBACK");
-    res.status(500).json({ message: "Failed to delete staff.", error: error.message });
-  }
+        if (staffResult.affectedRows === 0) {
+            throw new Error('Staff not found');
+        }
+
+        // Commit the transaction
+        await mysql.promise().query("COMMIT");
+
+        res.json({ message: "Staff deleted successfully." });
+    } catch (error) {
+        // Rollback the transaction in case of error
+        await mysql.promise().query("ROLLBACK");
+        res.status(500).json({ message: "Failed to delete staff.", error: error.message });
+    }
 };
+//Get all deparments name
+exports.getAllDepartments = async (req, res) => {
+    try {
+        const [departments] = await mysql.promise().query("SELECT * FROM departments");
+        res.json(departments);
+    } catch (error) {
+        console.error("Error fetching departments:", error);
+        res.status(500).json({ message: "Failed to fetch departments." });
+    }
+};
+
+

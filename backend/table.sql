@@ -1,23 +1,31 @@
 CREATE DATABASE hospital_management;
 use hospital_management;
 
--- users_credentials
+DROP TABLE IF EXISTS patients;
+DROP TABLE IF EXISTS staffs;
+DROP TABLE IF EXISTS patient_credentials;
+DROP TABLE IF EXISTS staff_credentials
+
 CREATE TABLE patient_credentials (
-    patient_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    patient_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('patient') NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE staff_credentials (
-    staff_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    staff_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    staff_id INT NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('doctor', 'manager', 'admin') NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
 ) ENGINE=InnoDB;
 
 
@@ -31,26 +39,26 @@ CREATE TABLE patients (
     gender ENUM('Male', 'Female', 'Other'),
     address VARCHAR(225),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (patient_id) REFERENCES patient_credentials(patient_id)
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+
 -- Staff table
 CREATE TABLE staffs (
     staff_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     department_id INT NOT NULL,
-    manager_id INT NOT NULL,
+    manager_id INT DEFAULT 1,
     qualification VARCHAR(50),
     staff_name VARCHAR(50) NOT NULL,
     salary DECIMAL(10, 2) NOT NULL,
     job_type ENUM('doctor', 'manager', 'admin') NOT NULL,
     start_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (staff_id) REFERENCES staff_credentials(staff_id)
-
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
 ) ENGINE=InnoDB;
 
+
 -- Change for add-doctor function, might be change in the future
-ALTER TABLE staffs MODIFY manager_id INT DEFAULT 1;
 
 
 -- ALTER TABLE staffs ADD INDEX (department_id);

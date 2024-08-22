@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
-import axios from "axios";
 import AuthContext from "../../context/AuthContext";
+import api from "../../utils/api";
 
 const StaffList = () => {
   const [staff, setStaff] = useState([]);
@@ -9,37 +9,35 @@ const StaffList = () => {
   const [filter, setFilter] = useState({ department: "", name: "", role: "" });
   const { auth } = useContext(AuthContext);
 
-  useEffect(() => {
+ useEffect(() => {
     const fetchStaff = async () => {
       try {
-        const response = await axios.get("/api/admin/staff", {
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-          },
-        });
+        const response = await api.get("/admin/staff");
         setStaff(response.data);
       } catch (error) {
         console.error("Error fetching staff:", error);
       }
     };
 
+
     fetchStaff();
   }, [auth.token]);
 
   const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/api/admin/delete-staff/${id}`, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
-      });
-      setStaff(staff.filter((s) => s.staff_id !== id));
-    } catch (error) {
-      console.error("Error deleting staff:", error);
-      alert("Failed to delete staff. Please try again.");
-    }
+      try {
+          const response = await api.delete(`/admin/delete-staff/${id}`);
+          if (response.status === 200) {
+              setStaff(staff.filter((s) => s.staff_id !== id));
+              alert("Staff deleted successfully.");
+          } else {
+              alert("Failed to delete staff. Please try again.");
+          }
+      } catch (error) {
+          console.error("Error deleting staff:", error);
+          alert(`Failed to delete staff: ${error.response?.data?.message || "An error occurred"}`);
+      }
   };
-
+  
   const handleEdit = (staff) => {
     setSelectedStaff(staff);
     setIsEditing(true);
@@ -49,16 +47,12 @@ const StaffList = () => {
     e.preventDefault();
     try {
       const { staff_id, staff_name, department_id, qualification, salary, job_type } = selectedStaff;
-      await axios.put(`/api/admin/update-staff/${staff_id}`, {
+      await api.put(`/admin/update-staff/${staff_id}`, {
         name: staff_name,
         department_id,
         qualification,
         salary,
         role: job_type,
-      }, {
-        headers: {
-          Authorization: `Bearer ${auth.token}`,
-        },
       });
       setIsEditing(false);
       setStaff(staff.map((s) => (s.staff_id === staff_id ? selectedStaff : s)));

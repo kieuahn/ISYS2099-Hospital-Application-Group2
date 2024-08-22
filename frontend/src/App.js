@@ -6,13 +6,12 @@ import SignupPage from "./pages/SignupPage";
 import RoleRouting from "./components/RoleRouting";
 import AddDoctor from "./pages/Admin/addDoctor";
 import StaffList from "./pages/Admin/staffList";
-// import AddDoctor from "../pages/AddDoctor";
-// import StaffList from "../pages/StaffList";
-
+import NavBar from "./components/NavBar";
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <NavBar />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
