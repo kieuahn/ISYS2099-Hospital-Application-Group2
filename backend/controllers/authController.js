@@ -16,7 +16,7 @@ const login = async (req, res) => {
 
       if (patientRows.length > 0) {
          user = patientRows[0];
-         role = user.role; // Ensure 'role' exists in patient_credentials table
+         role = 'patient'; 
       } else {
          // If not a patient, check in the staff_credentials table
          query = "SELECT * FROM staff_credentials WHERE email = ?";
@@ -75,7 +75,7 @@ const signup = async (req, res) => {
 
       // Insert the new patient into the patient_credentials table
       const [result] = await connection.query(
-         "INSERT INTO patient_credentials (email, password, role) VALUES (?, ?, 'patient')",
+         "INSERT INTO patient_credentials (email, password) VALUES (?, ?)",
          [email, hashedPassword]
       );
 

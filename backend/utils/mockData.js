@@ -7,7 +7,7 @@ const seedData = async () => {
 
     // Insert patients into patient_credentials and patients tables
     await mysql.promise().query(
-      "INSERT INTO patient_credentials (email, password, role) VALUES (?, ?, 'patient')",
+      "INSERT INTO patient_credentials (email, password) VALUES (?, ?)",
       ['patient1@example.com', hashedPassword]
     );
     await mysql.promise().query(
@@ -15,7 +15,7 @@ const seedData = async () => {
     );
 
     await mysql.promise().query(
-      "INSERT INTO patient_credentials (email, password, role) VALUES (?, ?, 'patient')",
+      "INSERT INTO patient_credentials (email, password) VALUES (?, ?)",
       ['patient2@example.com', hashedPassword]
     );
     await mysql.promise().query(
