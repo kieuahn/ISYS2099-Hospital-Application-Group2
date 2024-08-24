@@ -5,6 +5,7 @@ import LoginPage from "./pages/onboarding/LoginPage";
 import SignupPage from "./pages/onboarding/SignupPage";
 import RoleRouting from "./utils/RoleRouting";
 import HomePage from "./pages/home/HomePage";
+import ErrorPage from "./pages/ErrorPage";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<RoleRouting />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/error" element={<ErrorPage />} />
         </Routes>
       </AuthProvider>
     </Router>
