@@ -6,6 +6,9 @@ import SignupPage from "./pages/onboarding/SignupPage";
 import RoleRouting from "./utils/RoleRouting";
 import HomePage from "./pages/home/HomePage";
 import ErrorPage from "./pages/ErrorPage";
+import NavBar from "./components/NavBar";
+import AddDoctor from "./pages/admin/AddDoctor";
+import StaffList from "./pages/admin/StaffList";
 
 function App() {
   return (
