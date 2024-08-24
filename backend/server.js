@@ -7,6 +7,7 @@ const authMiddleware = require("./middleware/authMiddleware");
 // ROUTES
 const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes")
+const doctorRoutes = require("./routes/doctorRoutes")
 
 require("dotenv").config();
 dotenv.config();
@@ -20,6 +21,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);
+app.use("/api/doctor", doctorRoutes);
 
 // Protected route example
 app.get("/api/patient-data", authMiddleware(["patient"]), (req, res) => {
