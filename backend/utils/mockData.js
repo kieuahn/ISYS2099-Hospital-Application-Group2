@@ -5,15 +5,11 @@ const seedData = async () => {
   try {
     const hashedPassword = await bcrypt.hash("password123", 10);
 
-    // Insert patients into patient_credentials and patients tables
-    await mysql.promise().query(
-      "INSERT INTO patient_credentials (email, password) VALUES (?, ?)",
-      ['patient1@example.com', hashedPassword]
     // Insert departments
     const [dept1] = await mysql.promise().query(
-        "INSERT INTO departments (department_name) VALUES (?)",
-        ['Emergency']
-      );
+      "INSERT INTO departments (department_name) VALUES (?)",
+      ['Emergency']
+    );
     const [dept2] = await mysql.promise().query(
       "INSERT INTO departments (department_name) VALUES (?)",
       ['Cardiology']
@@ -31,14 +27,11 @@ const seedData = async () => {
       ['Pediatrics']
     );
 
-    await mysql.promise().query(
-      "INSERT INTO patient_credentials (email, password) VALUES (?, ?)",
-      ['patient2@example.com', hashedPassword]
     // Insert patients into patients and patient_credentials tables
     const [result1] = await mysql.promise().query(
-        "INSERT INTO patients (patient_name, allergies, contact_number, date_of_birth, gender, address) VALUES (?, ?, ?, ?, ?, ?)",
-        ['John Doe', 'Peanuts', '555-1234', '1980-01-01', 'Male', '123 Main St']
-      );
+      "INSERT INTO patients (patient_name, allergies, contact_number, date_of_birth, gender, address) VALUES (?, ?, ?, ?, ?, ?)",
+      ['John Doe', 'Peanuts', '555-1234', '1980-01-01', 'Male', '123 Main St']
+    );
     await mysql.promise().query(
       "INSERT INTO patient_credentials (patient_id, email, password, role) VALUES (?, ?, ?, 'patient')",
       [result1.insertId, 'patient1@example.com', hashedPassword]
