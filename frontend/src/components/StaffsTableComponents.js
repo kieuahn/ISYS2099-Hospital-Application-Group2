@@ -44,8 +44,9 @@ const StaffManagement = () => {
   });
 
   return (
-    <div>
-      <div className="flex justify-between mb-4">
+    <div className="flex flex-col items-center">
+      <h1 className="text-2xl font-bold my-6">Staff</h1>
+      <div className="flex justify-between mb-4 w-full max-w-[860px]">
         <input
           type="text"
           placeholder="Search by name..."
@@ -69,7 +70,7 @@ const StaffManagement = () => {
         </div>
       </div>
 
-      <table className="w-full border-collapse">
+      <table className="w-full max-w-[860px] border-collapse">
         <thead>
           <tr className="bg-gray-200">
             <th className="py-2 px-4 border">Staff ID</th>
