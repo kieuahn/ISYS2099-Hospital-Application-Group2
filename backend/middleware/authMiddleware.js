@@ -1,31 +1,31 @@
 const jwt = require("jsonwebtoken");
 
-const authMiddleware = (roles = []) => {
-  if (typeof roles === "string") {
-    roles = [roles];
-  }
-
+const authMiddleware = (allowedRoles) => {
   return (req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ message: "Authorization header missing" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: "Access denied. No token provided." });
+      return res.status(401).json({ message: "Token missing" });
     }
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded;
+      req.user = decoded; // Attaches decoded token to req object
 
-      if (roles.length && !roles.includes(req.user.role)) {
-        return res
-          .status(403)
-          .json({ message: "Access denied. Unauthorized role." });
+      // Check if the user has one of the allowed roles
+      if (!allowedRoles.includes(req.user.role)) {
+        return res.status(403).json({ message: "Forbidden: Access is denied" });
       }
 
       next();
-    } catch (err) {
-      res.status(400).json({ message: "Invalid token." });
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid token" });
     }
   };
 };

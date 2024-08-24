@@ -5,16 +5,24 @@ import LoginPage from "./pages/onboarding/LoginPage";
 import SignupPage from "./pages/onboarding/SignupPage";
 import RoleRouting from "./utils/RoleRouting";
 import HomePage from "./pages/home/HomePage";
+import ErrorPage from "./pages/ErrorPage";
+import NavBar from "./components/NavBar";
+import AddDoctor from "./pages/admin/AddDoctor";
+import StaffList from "./pages/admin/StaffList";
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <NavBar />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<RoleRouting />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="/admin/add-doctor" element={<AddDoctor />} />
+          <Route path="/admin/staff-list" element={<StaffList />} />
         </Routes>
       </AuthProvider>
     </Router>
