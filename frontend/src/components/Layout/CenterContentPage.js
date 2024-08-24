@@ -7,6 +7,7 @@ const CenterContentPage = ({ children, maxWidth }) => {
                 <div className="flex flex-col w-full md:w-[60%] md:mr-6">
                     {children} {/* Renders all children passed to the component */}
                 </div>
+
             </div>
         </div>
     );

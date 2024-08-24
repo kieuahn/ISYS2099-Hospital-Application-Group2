@@ -9,6 +9,9 @@ import ErrorPage from "./pages/ErrorPage";
 import NavBar from "./components/NavBar";
 import AddDoctor from "./pages/admin/AddDoctor";
 import StaffList from "./pages/admin/StaffList";
+import Schedules from "./pages/doctor/Schedules";
+
+
 
 function App() {
   return (
@@ -23,6 +26,7 @@ function App() {
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/admin/add-doctor" element={<AddDoctor />} />
           <Route path="/admin/staff-list" element={<StaffList />} />
+          <Route path="/schedule" element={<Schedules />} />
         </Routes>
       </AuthProvider>
     </Router>

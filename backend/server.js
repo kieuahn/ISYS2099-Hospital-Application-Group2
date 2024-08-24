@@ -3,11 +3,9 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 // const connectMongoDB = require("./config/mongoDb");
 
-const authMiddleware = require("./middleware/authMiddleware");
 // ROUTES
 const authRoutes = require("./routes/authRoutes");
-const patientRoutes = require("./routes/patientRoutes")
-const authRoutes = require("./routes/authRoutes");
+const patientRoutes = require("./routes/patientRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const adminRoutes = require('./routes/adminRoutes');
 
