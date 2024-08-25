@@ -4,8 +4,8 @@ import AuthContext from "../context/AuthContext";
 import PatientDashboard from "../pages/patient/PatientDashboard";
 import DoctorDashboard from "../pages/DoctorDashboard";
 import ManagerDashboard from "../pages/ManagerDashboard";
-import AdminDashboard from "../pages/AdminDashboard";
-// import ErrorPage from "./pages/ErrorPage";
+import AdminDashboard from "../pages/Admin/AdminDashboard";
+import ErrorPage from "../pages/ErrorPage"
 
 const RoleRouting = () => {
   const { auth } = useContext(AuthContext);
@@ -27,7 +27,7 @@ const RoleRouting = () => {
     case "admin":
       return <AdminDashboard />;
     default:
-      return;
+      return <ErrorPage />;
   }
 };
 
