@@ -53,6 +53,18 @@ const DoctorCards = () => {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/appointments', formData); // Send form data to the backend API
+      alert('Appointment booked successfully!');
+      closeModal();
+    } catch (error) {
+      console.error('Error booking appointment:', error);
+      alert('Failed to book appointment. Please try again later.');
+    }
+  };
+
   return (
     <div className="flex flex-wrap justify-center">
       {doctors.map((doctor) => (
@@ -73,7 +85,7 @@ const DoctorCards = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
             <h3 className="text-xl font-bold mb-4">Make an Appointment with {selectedDoctor.staff_name}</h3>
-            <form>
+            <form onSubmit={handleSubmit}>
               <div className="mb-4">
                 <label>Name:</label>
                 <input
@@ -171,3 +183,7 @@ const DoctorCards = () => {
 };
 
 export default DoctorCards;
+
+// Backend API please add:
+// Fetch Doctors Endpoint: /api/doctors (GET)
+// Submit Appointment Endpoint: /api/appointments (POST)
