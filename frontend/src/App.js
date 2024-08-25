@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import RoleRouting from "./components/RoleRouting";
+import StaffManagement from "./components/StaffsTableComponents";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<RoleRouting />} />
+          <Route path="/component" element={<StaffManagement />} />
         </Routes>
       </AuthProvider>
     </Router>
