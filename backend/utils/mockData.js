@@ -33,7 +33,7 @@ const seedData = async () => {
       ['John Doe', 'Peanuts', '555-1234', '1980-01-01', 'Male', '123 Main St']
     );
     await mysql.promise().query(
-      "INSERT INTO patient_credentials (patient_id, email, password, role) VALUES (?, ?, ?, 'patient')",
+      "INSERT INTO patient_credentials (patient_id, email, password) VALUES (?, ?, ?)",
       [result1.insertId, 'patient1@example.com', hashedPassword]
     );
 
@@ -42,7 +42,7 @@ const seedData = async () => {
       ['Jane Smith', 'Shellfish', '555-5678', '1990-02-02', 'Female', '456 Oak Ave']
     );
     await mysql.promise().query(
-      "INSERT INTO patient_credentials (patient_id, email, password, role) VALUES (?, ?, ?, 'patient')",
+      "INSERT INTO patient_credentials (patient_id, email, password) VALUES (?, ?, ?)",
       [result2.insertId, 'patient2@example.com', hashedPassword]
     );
 

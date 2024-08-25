@@ -6,27 +6,6 @@ DROP TABLE IF EXISTS staffs;
 DROP TABLE IF EXISTS patient_credentials;
 DROP TABLE IF EXISTS staff_credentials
 
-CREATE TABLE patient_credentials (
-    patient_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
-) ENGINE=InnoDB;
-
-CREATE TABLE staff_credentials (
-    staff_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    staff_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('doctor', 'manager', 'admin') NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
-) ENGINE=InnoDB;
-
 
 -- Patient table-- 
 CREATE TABLE patients (
@@ -56,6 +35,34 @@ CREATE TABLE staffs (
     FOREIGN KEY (department_id) REFERENCES departments(department_id)
 ) ENGINE=InnoDB;
 
+-- Patient credentials table
+CREATE TABLE patient_credentials (
+    patient_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    patient_id INT NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
+) ENGINE=InnoDB;
+
+-- Staff credentials table
+CREATE TABLE staff_credentials (
+    staff_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    staff_id INT NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('doctor', 'manager', 'admin') NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
+) ENGINE=InnoDB;
+
+-- departments table
+CREATE TABLE departments (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(100) NOT NULL
+)
 
 -- Change for add-doctor function, might be change in the future
 
