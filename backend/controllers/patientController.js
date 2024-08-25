@@ -56,7 +56,7 @@ const editPatientProfile = async (req, res) => {
 }
 
 // Patient view upcoming and proceeding appointments
-const viewUpcomingProceedingAppointments = async (req, res) => {
+const patientViewUpcomingProceedingAppointments = async (req, res) => {
     const patient_id = req.user.user_id;
 
     try {
@@ -65,20 +65,20 @@ const viewUpcomingProceedingAppointments = async (req, res) => {
                         AND (status LIKE "upcoming" OR status LIKE "proceeding");`
         const [appointments] = await mysql.promise().query(query, [patient_id])
 
-    if (appointments.length === 0) {
-        return res.status(200).json({message: "No upcoming appointment yet"})
-    }
-    
-    return res.status(200).json(appointments)
+        if (appointments.length === 0) {
+            return res.status(200).json({ message: "No upcoming appointment yet" })
+        }
+
+        return res.status(200).json(appointments)
     }
     catch (err) {
-        console.error("Error: ", err.stack );
-        return res.status(500).json({error: err.message})
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message })
     }
 }
 
 // Patient view past appointments including cancelled and completed appointment
-const viewHistoryAppointments = async (req, res) => {
+const patientViewHistoryAppointments = async (req, res) => {
     const patient_id = req.user.user_id;
 
     try {
@@ -87,58 +87,58 @@ const viewHistoryAppointments = async (req, res) => {
                         AND (status LIKE "completed" OR status LIKE "cancelled");`
         const [appointments] = await mysql.promise().query(query, [patient_id])
 
-    if (appointments.length === 0) {
-        return res.status(200).json({message: "No past appointment"})
-    }
-    
-    return res.status(200).json(appointments)
+        if (appointments.length === 0) {
+            return res.status(200).json({ message: "No past appointment" })
+        }
+
+        return res.status(200).json(appointments)
     }
     catch (err) {
-        console.error("Error: ", err.stack );
-        return res.status(500).json({error: err.message})
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message })
     }
 }
 
 // Patient view list of all the treatments given in each appoinment
-const viewTreatmentList = async (req, res) => {
+const patientViewTreatmentList = async (req, res) => {
     const patient_id = req.user.user_id;
 
     try {
-        const query = `SELECT * FROM treatmentHistory 
+        const query = `SELECT treatment_id, patient_id, appointment_id, diagnosis, treatment_date FROM treatment_notes 
                         WHERE patient_id = ?;`
         const [treatments] = await mysql.promise().query(query, [patient_id])
 
-    if (treatments.length === 0) {
-        return res.status(200).json({message: "No past treatment"})
-    }
-    
-    return res.status(200).json(appointments)
+        if (treatments.length === 0) {
+            return res.status(200).json({ message: "No past treatment" })
+        }
+
+        return res.status(200).json(treatments)
     }
     catch (err) {
-        console.error("Error: ", err.stack );
-        return res.status(500).json({error: err.message})
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message })
     }
 }
 
 // Patient view each treatment's note
-const viewTreatmentNote = async (req, res) => {
+const patientViewTreatmentNote = async (req, res) => {
     const patient_id = req.user.user_id;
     const appointment_id = req.params.appointment_id;
-
+    
     try {
-        const query = `SELECT * FROM treatment_history  
+        const query = `SELECT * FROM treatment_notes  
             WHERE appointment_id = ? AND patient_id = ?`
 
         const [notesList] = await mysql.promise().query(query, [appointment_id, patient_id])
         if (notesList.length === 0) {
-            return res.status(200).json({message: "No treatments yet"})
+            return res.status(200).json({ message: "No treatments yet" })
         }
 
-        return res.status(200).json(notesList)
+        return res.status(200).json(notesList[0])
     }
     catch (err) {
-        console.error("Error: ", err.stack );
-        return res.status(500).json({error: err.message})
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message })
     }
 }
 
@@ -155,7 +155,7 @@ const bookAppointment = async (req, res) => {
     const patient_id = req.user.patient_id;
     const doctor_id = req.params.staff_id;
 
-    
+
 }
 
 // Patient cancel an appointment, delete the patient note at the same time because the appointment has yet
@@ -165,4 +165,11 @@ const cancelAppointment = async (req, res) => {
     const appointment_id = req.params.appointment_id;
 }
 
-module.exports = { getPatientProfile }
+module.exports = {
+    getPatientProfile,
+    editPatientProfile,
+    patientViewUpcomingProceedingAppointments,
+    patientViewHistoryAppointments,
+    patientViewTreatmentList,
+    patientViewTreatmentNote
+}

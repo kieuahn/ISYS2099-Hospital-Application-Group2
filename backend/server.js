@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const adminRoutes = require('./routes/adminRoutes');
+const doctorRoutes = require("./routes/doctorRoutes")
 
 require("dotenv").config();
 dotenv.config();
@@ -21,7 +22,6 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);
-app.use("/api/admin", adminRoutes);
 
 
 const PORT = process.env.PORT || 5000;
