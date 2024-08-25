@@ -44,33 +44,33 @@ const StaffManagement = () => {
   });
 
   return (
-    <div className="flex flex-col items-center">
-      <h1 className="text-2xl font-bold my-6">Staff</h1>
-      <div className="flex justify-between mb-4 w-full max-w-[860px]">
+    <div className="flex flex-col items-center p-4">
+      <h1 className="text-3xl font-bold my-6">Staff Management</h1>
+      <div className="flex flex-col w-full max-w-[860px] mb-4">
         <input
           type="text"
           placeholder="Search by name..."
           value={searchTerm}
           onChange={handleSearch}
-          className="px-4 py-2 border border-gray-300 rounded-md"
+          className="px-4 py-2 border border-gray-300 rounded-md mb-4"
         />
-        <div>
+        <div className="flex justify-between mb-4">
           <button
             onClick={() => handleSort('staff_id')}
-            className="px-4 py-2 mr-2 bg-blue-500 text-white rounded-md"
+            className="px-4 py-2 mr-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
           >
             Staff ID {sortColumn === 'staff_id' && (sortDirection === 'asc' ? '▲' : '▼')}
           </button>
           <button
             onClick={() => handleSort('staff_name')}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md"
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
           >
             Name {sortColumn === 'staff_name' && (sortDirection === 'asc' ? '▲' : '▼')}
           </button>
         </div>
       </div>
 
-      <table className="w-full max-w-[860px] border-collapse">
+      <table className="w-full max-w-[860px] border-collapse shadow-md">
         <thead>
           <tr className="bg-gray-200">
             <th className="py-2 px-4 border">Staff ID</th>
@@ -82,20 +82,16 @@ const StaffManagement = () => {
         </thead>
         <tbody>
           {sortedStaffs.map((staff) => (
-            <tr key={staff.staff_id} className="border-b">
+            <tr key={staff.staff_id} className="border-b hover:bg-gray-100 transition">
               <td className="py-2 px-4">{staff.staff_id}</td>
               <td className="py-2 px-4">{staff.staff_name}</td>
               <td className="py-2 px-4">{staff.job_type}</td>
               <td className="py-2 px-4">{staff.department_id}</td>
               <td className="py-2 px-4">
-                <button
-                  className="px-4 py-2 mr-2 bg-green-500 text-white rounded-md"
-                >
+                <button className="px-4 py-2 mr-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
                   Update
                 </button>
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded-md"
-                >
+                <button className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition">
                   Delete
                 </button>
               </td>
