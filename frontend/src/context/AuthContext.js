@@ -1,39 +1,29 @@
 import React, { createContext, useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
-  const navigate = useNavigate(); // This works only if AuthProvider is inside Router
+  const navigate = useNavigate();
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      console.log("API response:", response.data); // Check what is being returned
-      const { token, role } = response.data;
-      setAuth({ token, role });
-      localStorage.setItem("authToken", token);
-
-      // Redirect to dashboard after login
+      const response = await api.post("/auth/login", { email, password });
+      const { token, role, name } = response.data; // Ensure 'name' is included in the response
+      setAuth({ token, role, name });
+      localStorage.setItem("authToken", token); // Store token
       navigate("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error.response.data); // Provide more detailed error logging
+      console.error("Login failed:", error);
       throw new Error("Login failed");
     }
   };
 
   const logout = () => {
     setAuth(null);
-    localStorage.removeItem("authToken");
+    localStorage.removeItem("authToken"); // Remove token
     navigate("/login");
   };
 

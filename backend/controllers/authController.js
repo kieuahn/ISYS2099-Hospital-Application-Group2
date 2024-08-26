@@ -16,14 +16,14 @@ const login = async (req, res) => {
 
       if (patientRows.length > 0) {
          user = patientRows[0];
-         role = user.role; // Ensure 'role' exists in patient_credentials table
+         role = 'patient'; 
       } else {
          // If not a patient, check in the staff_credentials table
          query = "SELECT * FROM staff_credentials WHERE email = ?";
          const [staffRows] = await mysql.promise().query(query, [email]);
-
+         
          if (staffRows.length === 0) {
-            return res.status(400).json({ message: "Invalid email or password" });
+            return res.status(400).json({ message: "Invalid email" });
          }
 
          user = staffRows[0];
@@ -33,11 +33,11 @@ const login = async (req, res) => {
       const isMatch = await bcrypt.compare(password, user.password);
 
       if (!isMatch) {
-         return res.status(400).json({ message: "Invalid email or password" });
+         return res.status(400).json({ message: "Invalid password" });
       }
 
       const token = jwt.sign(
-         { user_id: user.user_id || user.staff_id, role: role }, // Use user_id for patients and staff_id for staff
+         { user_id: user.patient_id || user.staff_id, role: role }, // Use patient_id for patients and staff_id for staff
          process.env.JWT_SECRET,
          { expiresIn: "1h" }
       );
@@ -75,7 +75,7 @@ const signup = async (req, res) => {
 
       // Insert the new patient into the patient_credentials table
       const [result] = await connection.query(
-         "INSERT INTO patient_credentials (email, password, role) VALUES (?, ?, 'patient')",
+         "INSERT INTO patient_credentials (email, password) VALUES (?, ?)",
          [email, hashedPassword]
       );
 
