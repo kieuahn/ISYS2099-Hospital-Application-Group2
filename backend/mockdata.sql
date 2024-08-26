@@ -15,13 +15,17 @@ VALUES
 ('DPT005', 'Orthopedics');
 
 -- Insert into staffs
-INSERT INTO staff (staff_name, department_id, manager_id, qualification, salary, job_type, start_date)
-VALUES 
-  ('Dr. Emily Davis', 'DPT001', 2, 'MD', 95000.00, 'Doctor', '2024-02-01'),  
-  ('John Smith', NULL, NULL, 'MBA', 75000.00, 'Manager', '2024-03-01'),       
-  ('Alice Johnson', NULL, NULL, 'PhD', 85000.00, 'Admin', '2024-04-01'),      
-  ('Dr. Robert Brown', 'DPT002', 2, 'MD', 92000.00, 'Doctor', '2024-05-01'); 
+-- First, insert managers with NULL manager_id
+INSERT INTO staff (staff_name, department_id, manager_id, qualification, salary, job_type, start_date) 
+VALUES
+  ('John Smith', NULL, NULL, 'MBA', 75000.00, 'Manager', '2024-03-01'),
+  ('Alice Johnson', NULL, NULL, 'PhD', 85000.00, 'Admin', '2024-04-01');
 
+-- Then, insert staff who reference these managers
+INSERT INTO staff (staff_name, department_id, manager_id, qualification, salary, job_type, start_date) 
+VALUES
+  ('Dr. Emily Davis', 'DPT001', 2, 'MD', 95000.00, 'Doctor', '2024-02-01'),
+  ('Dr. Robert Brown', 'DPT002', 2, 'MD', 92000.00, 'Doctor', '2024-05-01');
 
 -- Insert into patient_credential (password: password1234)
 INSERT INTO patient_credentials (email, password, patient_id)
@@ -74,3 +78,4 @@ VALUES
     (1, 1, 4.50),  
     (4, 2, 4.75),  
     (4, 4, 4.80); 
+
