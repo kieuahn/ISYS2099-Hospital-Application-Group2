@@ -66,15 +66,20 @@ const DoctorCards = () => {
   };
 
   return (
-    <div className="flex flex-wrap justify-center">
+    <div className="flex flex-wrap justify-center p-4">
       {doctors.map((doctor) => (
-        <div key={doctor.staff_id} className="m-4 p-4 border rounded-lg shadow-lg w-64">
-          <img src={doctor.image || 'default-doctor.png'} alt={doctor.staff_name} className="w-full h-32 object-cover rounded-t-lg" />
-          <h2 className="text-lg font-bold">{doctor.staff_name}</h2>
-          <p className="text-gray-600">{doctor.qualification}</p>
+        <div key={doctor.staff_id} className="m-4 p-4 border rounded-lg shadow-lg w-64 transition-transform transform hover:scale-105">
+          <img 
+            src={doctor.image || 'default-doctor.png'} 
+            alt={doctor.staff_name} 
+            className="w-full h-32 object-cover rounded-t-lg" 
+          />
+          <h2 className="text-lg font-bold mt-2">{doctor.staff_name}</h2>
+          <p className="text-gray-600">{doctor.department_name}</p> {/* Display department */}
+          <p className="text-gray-600">{doctor.qualification}</p> {/* Display qualification */}
           <button
             onClick={() => openModal(doctor)}
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
           >
             Make an Appointment
           </button>
@@ -94,6 +99,7 @@ const DoctorCards = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -104,6 +110,7 @@ const DoctorCards = () => {
                   value={formData.dob}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -113,6 +120,7 @@ const DoctorCards = () => {
                   value={formData.gender}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -128,6 +136,7 @@ const DoctorCards = () => {
                   value={formData.phone}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -138,6 +147,7 @@ const DoctorCards = () => {
                   value={formData.address}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -147,6 +157,7 @@ const DoctorCards = () => {
                   value={formData.symptoms}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 />
               </div>
               <div className="mb-4">
@@ -157,6 +168,7 @@ const DoctorCards = () => {
                   value={formData.appointmentDate}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2"
+                  required
                 />
                 <input
                   type="time"
@@ -164,13 +176,14 @@ const DoctorCards = () => {
                   value={formData.appointmentTime}
                   onChange={handleInputChange}
                   className="w-full border border-gray-300 rounded-md p-2 mt-2"
+                  required
                 />
               </div>
               <div className="flex justify-end">
                 <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-300 rounded-md mr-2">
                   Cancel
                 </button>
-                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md">
+                <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition">
                   Submit
                 </button>
               </div>
@@ -183,7 +196,3 @@ const DoctorCards = () => {
 };
 
 export default DoctorCards;
-
-// Backend API please add:
-// Fetch Doctors Endpoint: /api/doctors (GET)
-// Submit Appointment Endpoint: /api/appointments (POST)
