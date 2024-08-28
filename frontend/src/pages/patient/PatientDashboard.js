@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import DatePicker from "react-datepicker"; // Importing date picker for better date selection
+import "react-datepicker/dist/react-datepicker.css"; // Importing styles for date picker
 
 const PatientDashboard = () => {
   const [patientData, setPatientData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     patient_name: '',
-    dob: '',
+    dob: new Date(), // Initialize with a date object
     contact_number: '',
     email: '',
     gender: '',
@@ -23,7 +25,7 @@ const PatientDashboard = () => {
       setPatientData(response.data);
       setFormData({
         patient_name: response.data.patient_name,
-        dob: response.data.dob,
+        dob: new Date(response.data.dob), // Convert to Date object
         contact_number: response.data.contact_number,
         email: response.data.email,
         gender: response.data.gender,
@@ -89,11 +91,9 @@ const PatientDashboard = () => {
             </div>
             <div className="mb-4">
               <label className="block">Date of Birth:</label>
-              <input
-                type="date"
-                name="dob"
-                value={formData.dob}
-                onChange={handleInputChange}
+              <DatePicker
+                selected={formData.dob}
+                onChange={(date) => setFormData({ ...formData, dob: date })}
                 className="border rounded-md p-2 w-full"
                 required
               />
@@ -107,6 +107,7 @@ const PatientDashboard = () => {
                 onChange={handleInputChange}
                 className="border rounded-md p-2 w-full"
                 required
+                pattern="[0-9]*" // Restrict input to numbers only
               />
             </div>
             <div className="mb-4">
