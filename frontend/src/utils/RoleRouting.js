@@ -4,8 +4,8 @@ import AuthContext from "../context/AuthContext";
 import PatientDashboard from "../pages/patient/PatientDashboard";
 import DoctorDashboard from "../pages/DoctorDashboard";
 import ManagerDashboard from "../pages/ManagerDashboard";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import ErrorPage from "../pages/ErrorPage"
+import AdminDashboard from "../pages/Admin/AdminDashboard";
+import ErrorPage from "../pages/ErrorPage";
 
 const RoleRouting = () => {
   const { auth } = useContext(AuthContext);
@@ -18,13 +18,13 @@ const RoleRouting = () => {
 
   // Redirect based on role
   switch (auth.role) {
-    case "patient":
+    case "Patient":
       return <PatientDashboard />;
-    case "doctor":
+    case "Doctor":
       return <DoctorDashboard />;
-    case "manager":
+    case "Manager":
       return <ManagerDashboard />;
-    case "admin":
+    case "Admin":
       return <AdminDashboard />;
     default:
       return <ErrorPage />;

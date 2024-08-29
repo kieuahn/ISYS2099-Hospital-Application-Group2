@@ -7,7 +7,7 @@ const AddDoctor = () => {
   const [departmentId, setDepartmentId] = useState("");
   const [qualification, setQualification] = useState("");
   const [salary, setSalary] = useState("");
-  const [role, setRole] = useState("");
+  const [job_type, setRole] = useState("");
   const [departments, setDepartments] = useState([]);
 
   // Fetch departments
@@ -33,9 +33,9 @@ const AddDoctor = () => {
         department_id: departmentId,
         qualification,
         salary,
-        role,
+        job_type,
       });
-      alert(`${role.charAt(0).toUpperCase() + role.slice(1)} added successfully!`);
+      alert(`${job_type.charAt(0).toUpperCase() + job_type.slice(1)} added successfully!`);
     } catch (error) {
       console.error("Failed to add doctor:", error);
       alert("Failed to add doctor. Please try again.");
@@ -103,9 +103,9 @@ return (
           />
         </div>
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Role:</label>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Job Type:</label>
           <select
-            value={role}
+            value={job_type}
             onChange={(e) => setRole(e.target.value)}
             style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
             required

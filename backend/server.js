@@ -9,6 +9,7 @@ const patientRoutes = require("./routes/patientRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const adminRoutes = require('./routes/adminRoutes');
 const doctorRoutes = require("./routes/doctorRoutes")
+const managerRoutes = require("./routes/managerRoutes");
 
 require("dotenv").config();
 dotenv.config();
@@ -22,6 +23,10 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);
+app.use("/api/admin" , adminRoutes);
+console.log("Manager routes loaded");
+
+app.use("/api/manager", managerRoutes);
 
 
 const PORT = process.env.PORT || 5000;
