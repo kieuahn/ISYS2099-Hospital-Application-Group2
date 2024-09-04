@@ -16,9 +16,11 @@ const PatientDashboard = () => {
   });
   const [showProfile, setShowProfile] = useState(false);
   const [showAppointments, setShowAppointments] = useState(false);
+  const [showTreatments, setShowTreatments] = useState(false); // State for showing treatments
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [pastAppointments, setPastAppointments] = useState([]);
   const [activeTab, setActiveTab] = useState('upcoming'); // Track which tab is active
+  const [treatments, setTreatments] = useState([]); // State for treatments
 
   // State for custom date picker
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -28,6 +30,7 @@ const PatientDashboard = () => {
     fetchPatientProfile();
     fetchUpcomingAppointments();
     fetchPastAppointments();
+    fetchTreatments(); // Fetch treatments on load
   }, []);
 
   const fetchPatientProfile = async () => {
@@ -65,6 +68,15 @@ const PatientDashboard = () => {
       setPastAppointments(response.data);
     } catch (error) {
       console.error('Error fetching past appointments:', error);
+    }
+  };
+
+  const fetchTreatments = async () => {
+    try {
+      const response = await axios.get('/api/treatments'); // Adjust the endpoint as necessary
+      setTreatments(response.data);
+    } catch (error) {
+      console.error('Error fetching treatments:', error);
     }
   };
 
@@ -113,22 +125,28 @@ const PatientDashboard = () => {
         <nav className="mt-4">
           <ul>
             <li className="my-2" onClick={() => {
-              setShowProfile(!showProfile);
+              setShowProfile(true);
               setShowAppointments(false); // Hide appointments when clicking on My Profile
+              setShowTreatments(false); // Hide treatments
             }}>
               <a className="text-blue-500 cursor-pointer">My Profile</a>
             </li>
             <li className="my-2" onClick={() => {
-              setShowAppointments(!showAppointments);
+              setShowAppointments(true);
               setShowProfile(false); // Hide profile when clicking on Appointments
+              setShowTreatments(false); // Hide treatments
             }}>
               <a className="text-blue-500 cursor-pointer">Appointments</a>
             </li>
-            <li className="my-2">
-              <a className="text-blue-500 cursor-pointer">Doctor List</a>
+            <li className="my-2" onClick={() => {
+              setShowTreatments(true);
+              setShowProfile(false); // Hide profile when clicking on Treatments
+              setShowAppointments(false); // Hide appointments when clicking on Treatments
+            }}>
+              <a className="text-blue-500 cursor-pointer">Treatments</a>
             </li>
             <li className="my-2">
-              <a className="text-blue-500 cursor-pointer">Treatments</a>
+              <a className="text-blue-500 cursor-pointer">Doctor List</a>
             </li>
             <li className="my-2"><a className="text-blue-500">Help</a></li>
             <li className="my-2"><a className="text-blue-500">Logout</a></li>
@@ -319,6 +337,34 @@ const PatientDashboard = () => {
                   </table>
                 )}
               </div>
+            )}
+          </div>
+        )}
+
+        {showTreatments && (
+          <div className="border p-4 rounded-lg shadow-md mb-4">
+            <h2 className="text-2xl font-bold mb-4">Treatments</h2>
+            {treatments.length === 0 ? (
+              <p>No treatments yet.</p>
+            ) : (
+              <table className="min-w-full border">
+                <thead>
+                  <tr>
+                    <th className="border px-4 py-2">Treatment ID</th>
+                    <th className="border px-4 py-2">Diagnosis</th>
+                    <th className="border px-4 py-2">Treatment Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {treatments.map((treatment) => (
+                    <tr key={treatment.treatment_id}>
+                      <td className="border px-4 py-2">{treatment.treatment_id}</td>
+                      <td className="border px-4 py-2">{treatment.diagnosis}</td>
+                      <td className="border px-4 py-2">{new Date(treatment.treatment_date).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         )}
