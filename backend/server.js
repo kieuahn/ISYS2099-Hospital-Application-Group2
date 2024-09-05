@@ -1,28 +1,29 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-// const connectMongoDB = require("./config/mongoDb");
+const connectMongoDB = require("./config/mongoDb");
 
 // ROUTES
 const authRoutes = require("./routes/authRoutes");
 const patientRoutes = require("./routes/patientRoutes");
 const authMiddleware = require("./middleware/authMiddleware");
 const adminRoutes = require('./routes/adminRoutes');
-const doctorRoutes = require("./routes/doctorRoutes")
+const doctorRoutes = require("./routes/doctorRoutes");
 
 require("dotenv").config();
 dotenv.config();
-// connectMongoDB();
+connectMongoDB();
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);
-
+app.use("/api/doctor", doctorRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

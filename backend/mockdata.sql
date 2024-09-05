@@ -17,9 +17,9 @@ VALUES
 -- Insert into staffs
 INSERT INTO staff (staff_name, department_id, manager_id, qualification, salary, job_type, start_date)
 VALUES 
-  ('Dr. Emily Davis', 'DPT001', 2, 'MD', 95000.00, 'Doctor', '2024-02-01'),  
   ('John Smith', NULL, NULL, 'MBA', 75000.00, 'Manager', '2024-03-01'),       
-  ('Alice Johnson', NULL, NULL, 'PhD', 85000.00, 'Admin', '2024-04-01'),      
+  ('Alice Johnson', NULL, NULL, 'PhD', 85000.00, 'Admin', '2024-04-01'),  
+  ('Dr. Emily Davis', 'DPT001', 2, 'MD', 95000.00, 'Doctor', '2024-02-01'),  
   ('Dr. Robert Brown', 'DPT002', 2, 'MD', 92000.00, 'Doctor', '2024-05-01'); 
 
 
@@ -53,13 +53,13 @@ VALUES
 
 INSERT INTO doctor_schedules (staff_id, shift_start, shift_end, availability_status)
 VALUES 
-    -- Doctor 1's schedule
-    (1, '2024-08-25 08:00:00', '2024-08-25 09:00:00', 'Available'), 
-    (1, '2024-08-25 10:00:00', '2024-08-25 11:00:00', 'Available'), 
+    -- Doctor 3's schedule
+    (3, '2024-08-25 08:00:00', '2024-08-25 09:00:00', 'Available'), 
+    (3, '2024-08-25 10:00:00', '2024-08-25 11:00:00', 'Available'), 
 
     -- Doctor 4's schedule
-    (2, '2024-08-25 09:00:00', '2024-08-25 10:00:00', 'Busy'), 
-    (2, '2024-08-25 11:00:00', '2024-08-25 12:00:00', 'Available'); 
+    (4, '2024-08-25 09:00:00', '2024-08-25 10:00:00', 'Busy'), 
+    (4, '2024-08-25 11:00:00', '2024-08-25 12:00:00', 'Available'); 
 
 
 INSERT INTO job_history (staff_id, staff_name, department_id, manager_id, qualification, salary, job_type, updated_at)
