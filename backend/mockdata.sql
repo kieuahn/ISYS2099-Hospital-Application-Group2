@@ -33,9 +33,9 @@ VALUES
 -- Insert into staff_credential (password: password1234)
 INSERT INTO staff_credentials (email, password, staff_id, job_type)
 VALUES 
-  ('emily.davis@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 1, 'Doctor'),
-  ('john.smith@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 2, 'Manager'),
-  ('alice.johnson@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 3, 'Admin'),
+  ('emily.davis@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 3, 'Doctor'),
+  ('john.smith@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 1, 'Manager'),
+  ('alice.johnson@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 2, 'Admin'),
   ('robert.brown@hospital.com', '$2a$10$NK36mKFzBhnS9Sw/AD188OjPy/77UWnoYhIksXTcwnFKuH0AiyBYW', 4, 'Doctor');
 
 INSERT INTO appointments (patient_id, staff_id, purpose, status, start_time, end_time, payment_amount)
