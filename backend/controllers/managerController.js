@@ -96,9 +96,81 @@ exports.getDoctorSchedules = async (req, res) => {
             [manager_id, start_date, end_date]
         );
         
+        // Check if the schedules array is empty
+        if (schedules.length === 0) {
+            return res.status(403).json({ message: "Error: You do not supervise any doctor with schedules!" });
+        }
         res.json(schedules[0]); // Return the schedules to the client
     } catch (error) {
         console.error("Error fetching doctor schedules:", error.message);
         res.status(500).json({ message: "Failed to retrieve doctor schedules.", error: error.message });
     }
+};
+
+// View workload of a specific doctor supervised by the manager
+exports.getDoctorWorkload = async (req, res) => {
+    const { doctor_id } = req.params;
+    const { start_date, end_date } = req.query;
+    const manager_id = req.user.user_id; // Manager ID from token
+
+    try {
+        const [workload] = await mysql.promise().query(
+            `CALL GetDoctorWorkloadByManager(?, ?, ?, ?)`,
+            [manager_id, doctor_id, start_date, end_date]
+        );
+
+        // Check if the workload array is empty, meaning no result found
+        if (workload.length === 0) {
+            return res.status(403).json({ message: "Error: You do not supervise this doctor or no workload found in this duration." });
+        }
+
+        res.json(workload[0]);
+    } catch (error) {
+        console.error("Error retrieving doctor's workload:", error.message);
+        res.status(500).json({ message: "Failed to retrieve doctor's workload", error: error.message });
+    }
+};
+//View Doctocs's Workload of a doctor in given duration
+exports.getAllDoctorsWorkload = async (req, res) => {
+    const { start_date, end_date } = req.query;
+    const manager_id = req.user.user_id; // Manager ID from token
+
+    try {
+        const [workload] = await mysql.promise().query(
+            `CALL GetAllDoctorsWorkloadByManager(?, ?, ?)`,
+            [manager_id, start_date, end_date]
+        );
+
+        // Check if the workload array is empty, meaning no result found
+        if (workload.length === 0) {
+            return res.status(403).json({ message: "Error: You do not supervise this doctor or no workload found in this duration." });
+        }
+
+        res.json(workload[0]);
+    } catch (error) {
+        console.error("Error retrieving all doctors' workloads:", error.message);
+        res.status(500).json({ message: "Failed to retrieve all doctors' workloads", error: error.message });
+    }
+};
+
+//Get job history of a staff
+exports.getStaffJobHistory = async (req, res) => {
+  const { doctor_id } = req.params;
+  const manager_id = req.user.user_id; // Manager ID from token
+
+  try {
+    const[history] = await mysql.promise().query(`
+      CALL GetJobHistoryByManager(?, ?)`,
+      [doctor_id, manager_id]
+    );
+
+    if(history.length === 0) {
+      return res.status(404).json({message: "No job history found or staff not under this manager"})
+    }
+    
+    res.json(history);
+  } catch (error) {
+    console.error("Error fetching job history!", error);
+    res.status(500).json({ message: "Failed to fetch job history", error: error.message});
+  }
 };

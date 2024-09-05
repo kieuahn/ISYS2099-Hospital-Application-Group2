@@ -24,8 +24,6 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);
 app.use("/api/admin" , adminRoutes);
-console.log("Manager routes loaded");
-
 app.use("/api/manager", managerRoutes);
 
 

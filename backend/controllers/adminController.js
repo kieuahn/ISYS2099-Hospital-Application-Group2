@@ -67,6 +67,7 @@ exports.addStaff = async (req, res) => {
     const { name, email, department_id, qualification, salary, job_type } = req.body;
     const manager_id = req.user.user_id; // Assuming you attach user info to req.user after authentication
 
+    // console.log("body : ". req.body); //debug
     try {
         const hashedPassword = await bcrypt.hash("password123", 10);
 
