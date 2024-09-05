@@ -20,8 +20,7 @@ DROP PROCEDURE IF EXISTS AddStaff;
 DROP PROCEDURE IF EXISTS GetDoctorSchedulesByManager;
 DROP PROCEDURE IF EXISTS GetAllDoctorsWorkloadByManager;
 DROP PROCEDURE IF EXISTS GetJobHistoryByManager;
-DROP PROCEDURE IF EXISTS GetDoctorSchedulesByManager;
-
+DROP PROCEDURE IF EXISTS GetDoctorWorkloadByManager;
 
 DELIMITER //
 
@@ -57,9 +56,7 @@ BEGIN
     END IF;
 END //
 
-
 DELIMITER ;
-
 
 DELIMITER //
 
