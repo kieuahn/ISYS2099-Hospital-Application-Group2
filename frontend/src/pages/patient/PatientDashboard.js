@@ -3,6 +3,7 @@ import axios from 'axios';
 import DatePicker from "react-datepicker"; // Importing date picker for better date selection
 import "react-datepicker/dist/react-datepicker.css"; // Importing styles for date picker
 import './PatientDashboard.css'; // Importing the CSS file
+import DoctorCard from './DoctorCards'; // Adjust the path as necessary
 
 const PatientDashboard = () => {
   const [patientData, setPatientData] = useState(null);
@@ -26,12 +27,25 @@ const PatientDashboard = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  const [showDoctorList, setShowDoctorList] = useState(false); // State for showing doctor list
+  const [doctors, setDoctors] = useState([]); // State for doctors
+
   useEffect(() => {
     fetchPatientProfile();
     fetchUpcomingAppointments();
     fetchPastAppointments();
-    fetchTreatments(); // Fetch treatments on load
+    fetchTreatments();
+    fetchDoctors(); // Fetch doctors on load
   }, []);
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await axios.get('/api/doctors'); // Replace with your actual API endpoint
+      setDoctors(response.data);
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  };
 
   const fetchPatientProfile = async () => {
     try {
@@ -128,6 +142,7 @@ const PatientDashboard = () => {
               setShowProfile(true);
               setShowAppointments(false); // Hide appointments when clicking on My Profile
               setShowTreatments(false); // Hide treatments
+              setShowDoctorList(false); // Hide doctor list
             }}>
               <a className="text-blue-500 cursor-pointer">My Profile</a>
             </li>
@@ -135,6 +150,7 @@ const PatientDashboard = () => {
               setShowAppointments(true);
               setShowProfile(false); // Hide profile when clicking on Appointments
               setShowTreatments(false); // Hide treatments
+              setShowDoctorList(false); // Hide doctor list
             }}>
               <a className="text-blue-500 cursor-pointer">Appointments</a>
             </li>
@@ -142,10 +158,16 @@ const PatientDashboard = () => {
               setShowTreatments(true);
               setShowProfile(false); // Hide profile when clicking on Treatments
               setShowAppointments(false); // Hide appointments when clicking on Treatments
+              setShowDoctorList(false); // Hide doctor list
             }}>
               <a className="text-blue-500 cursor-pointer">Treatments</a>
             </li>
-            <li className="my-2">
+            <li className="my-2" onClick={() => {
+              setShowDoctorList(true);
+              setShowProfile(false); // Hide profile when clicking on Doctor List
+              setShowAppointments(false); // Hide appointments
+              setShowTreatments(false); // Hide treatments
+            }}>
               <a className="text-blue-500 cursor-pointer">Doctor List</a>
             </li>
             <li className="my-2"><a className="text-blue-500">Help</a></li>
@@ -366,6 +388,15 @@ const PatientDashboard = () => {
                 </tbody>
               </table>
             )}
+          </div>
+        )}
+
+        {showDoctorList && (
+          <div className="border p-4 rounded-lg shadow-md mb-4">
+            <h2 className="text-2xl font-bold mb-4">Doctor List</h2>
+            {doctors.map((doctor) => (
+              <DoctorCard key={doctor.doctor_id} doctor={doctor} />
+            ))}
           </div>
         )}
       </div>
