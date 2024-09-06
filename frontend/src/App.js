@@ -10,6 +10,10 @@ import AddDoctor from "./pages/admin/AddDoctor";
 import StaffList from "./pages/admin/StaffList";
 import Schedules from "./pages/doctor/Schedules";
 import PatientDashboard from "./pages/patient/PatientDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import DoctorDashboard from "./pages/DoctorDashboard";
+import ManagerDashboard from "./pages/ManagerDashboard";
+
 function App() {
   return (
     <Router>
@@ -20,7 +24,9 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<RoleRouting />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
-
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/manager/dashboard" element={<ManagerDashboard />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/admin/add-doctor" element={<AddDoctor />} />
           <Route path="/admin/staff-list" element={<StaffList />} />
