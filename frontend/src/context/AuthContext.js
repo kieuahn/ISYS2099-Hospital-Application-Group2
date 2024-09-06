@@ -1,12 +1,22 @@
 import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      // Fetch user details with the token or set a predefined role
+      // You can fetch user details or decode the token if necessary
+      setAuth({ token, role: "patient" }); // Assuming "patient" as default
+    }
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -15,20 +25,25 @@ export const AuthProvider = ({ children }) => {
       setAuth({ token, role, name });
       localStorage.setItem("authToken", token); // Store token
       console.log("Navigating to dashboard...");
+
       // Dynamic navigation based on role
-      let roleDashboard = '/dashboard';
-      if (role === 'admin') {
-        roleDashboard = '/admin/dashboard';
-      } else if (role === 'doctor') {
-        roleDashboard = '/doctor/dashboard';
-      } else if (role === 'manager') {
-        roleDashboard = '/manager/dashboard';
-      } else if (role === 'patient') {
-        roleDashboard = '/patient/dashboard';
+      switch (role) {
+        case "admin":
+          navigate('/dashboard/admin');
+          break;
+        case "doctor":
+          navigate('/dashboard/doctor');
+          break;
+        case "manager":
+          navigate('/dashboard/manager');
+          break;
+        case "patient":
+          navigate('/dashboard/patient');
+          break;
+        default:
+          navigate('/dashboard');
+          break;
       }
-
-      navigate(roleDashboard);
-
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Login failed");
