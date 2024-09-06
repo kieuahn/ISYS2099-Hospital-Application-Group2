@@ -7,8 +7,8 @@ import RoleRouting from "./utils/RoleRouting";
 import HomePage from "./pages/home/HomePage";
 import ErrorPage from "./pages/ErrorPage";
 import NavBar from "./components/NavBar";
-import AddDoctor from "./pages/Admin/AddDoctor";
-import StaffList from "./pages/Admin/StaffList";
+import AddDoctor from "./pages/admin/AddDoctor";
+import StaffList from "./pages/admin/StaffList";
 import Schedules from "./pages/doctor/Schedules";
 
 
