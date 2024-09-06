@@ -14,7 +14,21 @@ export const AuthProvider = ({ children }) => {
       const { token, role, name } = response.data; // Ensure 'name' is included in the response
       setAuth({ token, role, name });
       localStorage.setItem("authToken", token); // Store token
-      navigate("/dashboard");
+      console.log("Navigating to dashboard...");
+      // Dynamic navigation based on role
+      let roleDashboard = '/dashboard';
+      if (role === 'admin') {
+        roleDashboard = '/admin/dashboard';
+      } else if (role === 'doctor') {
+        roleDashboard = '/doctor/dashboard';
+      } else if (role === 'manager') {
+        roleDashboard = '/manager/dashboard';
+      } else if (role === 'patient') {
+        roleDashboard = '/patient/dashboard';
+      }
+
+      navigate(roleDashboard);
+
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Login failed");

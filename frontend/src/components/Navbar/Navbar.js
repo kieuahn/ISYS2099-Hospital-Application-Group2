@@ -1,8 +1,11 @@
 import React from 'react';
 import LeftContent from './LeftContent/LeftContent';
 import RightContent from './RightContent/RightContent';
+import { useContext } from 'react';
+import AuthContext from '../../context/AuthContext';
 
-export default function Navbar() {
+const NavBar = () => {
+    const { auth } = useContext(AuthContext);
     return (
         <nav className="bg-gray-800">
             <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -15,11 +18,13 @@ export default function Navbar() {
                                 className="h-8 w-auto"
                             />
                         </div>
-                        <LeftContent />
+                        <LeftContent auth={auth} />
                     </div>
                     <RightContent />
                 </div>
             </div>
         </nav>
     );
-}
+};
+
+export default NavBar;
