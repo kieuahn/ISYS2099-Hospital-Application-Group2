@@ -109,27 +109,43 @@ exports.getDoctorSchedules = async (req, res) => {
 
 // View workload of a specific doctor supervised by the manager
 exports.getDoctorWorkload = async (req, res) => {
-    const { doctor_id } = req.params;
-    const { start_date, end_date } = req.query;
-    const manager_id = req.user.user_id; // Manager ID from token
+  const { doctor_id } = req.params;
+  const { start_date, end_date } = req.query;
+  const manager_id = req.user.user_id; // Manager ID from token
 
-    try {
-        const [workload] = await mysql.promise().query(
-            `CALL GetDoctorWorkloadByManager(?, ?, ?, ?)`,
-            [manager_id, doctor_id, start_date, end_date]
-        );
+  try {
+      const [workload] = await mysql.promise().query(
+          `CALL GetDoctorWorkloadByManager(?, ?, ?, ?)`,
+          [manager_id, doctor_id, start_date, end_date]
+      );
 
-        // Check if the workload array is empty, meaning no result found
-        if (workload.length === 0) {
-            return res.status(403).json({ message: "Error: You do not supervise this doctor or no workload found in this duration." });
-        }
+      // Debugging: Log the returned workload to inspect it
+      console.log("Workload result:", workload);
+      
+      
+      // Check if the stored procedure returns 'not_supervised'
+      if (workload[0] && workload[0][0].error_message === 'not_supervised') {
+          return res.status(403).json({ message: "You do not supervise this doctor." });
+      }
 
-        res.json(workload[0]);
-    } catch (error) {
-        console.error("Error retrieving doctor's workload:", error.message);
-        res.status(500).json({ message: "Failed to retrieve doctor's workload", error: error.message });
-    }
+      // Check if the stored procedure returns 'no_workload'
+      if (workload[0] && workload[0][0].error_message === 'no_workload') {
+          return res.status(200).json({ message: "The doctor has no workload during this period." });
+      }
+
+      // If workload is found, return the data
+      if (workload.length > 0) {
+          return res.json(workload[0]);
+      }
+
+      // Fallback to ensure that empty results are handled
+      return res.status(500).json({ message: "Unexpected error occurred." });
+  } catch (error) {
+      console.error("Error retrieving doctor's workload:", error.message);
+      res.status(500).json({ message: "Failed to retrieve doctor's workload", error: error.message });
+  }
 };
+
 //View Doctocs's Workload of a doctor in given duration
 exports.getAllDoctorsWorkload = async (req, res) => {
     const { start_date, end_date } = req.query;
@@ -165,7 +181,7 @@ exports.getStaffJobHistory = async (req, res) => {
     );
 
     if(history.length === 0) {
-      return res.status(404).json({message: "No job history found or staff not under this manager"})
+      return res.status(404).json({message: "No job his tory found or staff not under this manager"})
     }
     
     res.json(history);

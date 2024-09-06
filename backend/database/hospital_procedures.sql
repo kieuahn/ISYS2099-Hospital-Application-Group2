@@ -119,23 +119,39 @@ CREATE PROCEDURE GetDoctorWorkloadByManager(
     IN p_end_date DATETIME
 )
 BEGIN
-    SELECT 
-        s.staff_id,
-        s.staff_name,
-        COUNT(a.appointment_id) AS total_appointments,
-        SUM(TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)) AS total_minutes
-    FROM 
-        appointments a
-    INNER JOIN 
-        staff s ON a.staff_id = s.staff_id
-    WHERE 
-        s.manager_id = p_manager_id 
-        AND s.staff_id = p_doctor_id
-        AND a.start_time BETWEEN p_start_date AND p_end_date
-    GROUP BY s.staff_id, s.staff_name;
+    -- First, check if the doctor is supervised by the manager
+    IF EXISTS (
+        SELECT 1 FROM staff WHERE staff_id = p_doctor_id AND manager_id = p_manager_id
+    ) THEN
+        -- Fetch the workload if the doctor is supervised
+        SELECT 
+            s.staff_id,
+            s.staff_name,
+            COUNT(a.appointment_id) AS total_appointments,
+            SUM(TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)) AS total_minutes
+        FROM 
+            appointments a
+        INNER JOIN 
+            staff s ON a.staff_id = s.staff_id
+        WHERE 
+            s.manager_id = p_manager_id 
+            AND s.staff_id = p_doctor_id
+            AND a.start_time BETWEEN p_start_date AND p_end_date
+        GROUP BY s.staff_id, s.staff_name;
+
+        -- If no appointments, return a message for no workload
+        IF ROW_COUNT() = 0 THEN
+            SELECT 'no_workload' AS error_message;
+        END IF;
+    ELSE
+        -- If the doctor is not supervised by the manager, return a different message
+        SELECT 'not_supervised' AS error_message;
+    END IF;
 END //
 
 DELIMITER ;
+
+
 
 DELIMITER $$
 
