@@ -16,7 +16,7 @@ const login = async (req, res) => {
 
       if (patientRows.length > 0) {
          user = patientRows[0];
-         role = 'patient'; 
+         role = 'Patient'; 
       } else {
          // If not a patient, check in the staff_credentials table
          query = "SELECT * FROM staff_credentials WHERE email = ?";
@@ -27,7 +27,7 @@ const login = async (req, res) => {
          }
 
          user = staffRows[0];
-         role = user.role; // Ensure 'role' exists in staff_credentials table
+         role = user.job_type; // Ensure 'role' exists in staff_credentials table
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
