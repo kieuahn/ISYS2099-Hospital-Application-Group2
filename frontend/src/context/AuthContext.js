@@ -14,14 +14,14 @@ export const AuthProvider = ({ children }) => {
     if (token) {
       // Fetch user details with the token or set a predefined role
       // You can fetch user details or decode the token if necessary
-      setAuth({ token, role: "patient" }); // Assuming "patient" as default
+      setAuth({ token, role: "doctor" }); // Assuming "patient" as default
     }
   }, []);
 
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { token, role, name } = response.data; // Ensure 'name' is included in the response
+      const { token, role, name } = response.data;
       setAuth({ token, role, name });
       localStorage.setItem("authToken", token); // Store token
       console.log("Navigating to dashboard...");
@@ -29,16 +29,16 @@ export const AuthProvider = ({ children }) => {
       // Dynamic navigation based on role
       switch (role) {
         case "admin":
-          navigate('/dashboard/admin');
+          navigate('/admin/dashboard');
           break;
         case "doctor":
-          navigate('/dashboard/doctor');
+          navigate('/doctor/dashboard');
           break;
         case "manager":
-          navigate('/dashboard/manager');
+          navigate('/manager/dashboard');
           break;
         case "patient":
-          navigate('/dashboard/patient');
+          navigate('/patient/dashboard');
           break;
         default:
           navigate('/dashboard');

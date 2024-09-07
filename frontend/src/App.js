@@ -23,10 +23,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<RoleRouting />} />
-          <Route path="/dashboard/patient" element={<PatientDashboard />} />
-          <Route path="/dashboard/admin" element={<AdminDashboard />} />
-          <Route path="/dashboard/doctor" element={<DoctorDashboard />} />
-          <Route path="/dashboard/manager" element={<ManagerDashboard />} />
+          <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <Route path="/manager/dashboard" element={<ManagerDashboard />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/admin/add-doctor" element={<AddDoctor />} />
           <Route path="/admin/staff-list" element={<StaffList />} />
