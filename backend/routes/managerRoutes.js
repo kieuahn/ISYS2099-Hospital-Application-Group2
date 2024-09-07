@@ -2,14 +2,25 @@ const express = require('express');
 const router = express.Router();
 const managerController = require("../controllers/managerController");
 const authMiddleware = require('../middleware/authMiddleware');
+const adminController = require('../controllers/adminController');
 
-router.get("/staff", authMiddleware(['Manager']), managerController.listSupervisedStaff);
-router.get("/staff-by-department", authMiddleware(['Manager']), managerController.getStaffByDepartment);
+
+router.post('/add-staff', authMiddleware(['Admin', 'Manager']), adminController.addStaff);
+
+router.get('/supervised-staff', authMiddleware(['Manager']), managerController.listSupervisedStaff);
+router.get('/staff-by-department', authMiddleware(['Manager']), managerController.getStaffByDepartment);
 router.get("/staff-by-name", authMiddleware(['Manager']), managerController.getStaffByName);
-router.put("/update-staff/:id", authMiddleware(['Manager']), managerController.updateStaff);
+router.put('/staff/:id', authMiddleware(['Admin', 'Manager']), adminController.updateStaff);
 router.get("/doctor-schedules", authMiddleware(['Manager']), managerController.getDoctorSchedules);
-router.get("/doctor-workload/:doctor_id", authMiddleware(['Manager']), managerController.getDoctorWorkload);
-router.get("/all-doctors-workload", authMiddleware(['Manager']), managerController.getAllDoctorsWorkload);
-router.get("/job-history/:doctor_id", authMiddleware(['Manager']), managerController.getStaffJobHistory);
+router.get('/doctor/:doctor_id/workload', authMiddleware(['Manager']), managerController.getDoctorWorkload);
+router.get('/doctors/workload', authMiddleware(['Manager']), managerController.getAllDoctorsWorkload);
+router.get('/staff/:staff_id/job-history', authMiddleware(['Manager']), managerController.getJobHistory);
+
+
+router.get('/search-patient', authMiddleware(['Admin', 'Manager']), managerController.searchPatient);
+
+router.get('/patients/:patient_id/treatment-history', authMiddleware(['Manager']), managerController.getPatientTreatmentHistory);
+router.get('/patients/treatment-history', authMiddleware(['Manager']), managerController.getPatientTreatmentHistory);
+
 
 module.exports = router;

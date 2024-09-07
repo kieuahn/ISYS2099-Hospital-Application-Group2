@@ -1,27 +1,43 @@
-/**
- * Procedure to add a new staff member to the system.
- *
- * This procedure checks the role of the manager/admin performing the operation
- * and restricts the job type accordingly. Managers can only add Doctors.
- *
- * @param p_staff_name VARCHAR(50) - The name of the staff member
- * @param p_email VARCHAR(100) - The email address of the staff member
- * @param p_password VARCHAR(255) - The password for the staff member
- * @param p_department_id VARCHAR(6) - The department ID of the staff member
- * @param p_qualification VARCHAR(50) - The qualification of the staff member
- * @param p_salary DECIMAL(10,2) - The salary of the staff member
- * @param p_job_type ENUM('Doctor', 'Manager', 'Admin') - The job type of the staff member
- * @param p_manager_id INT - The ID of the manager/admin performing the operation
- *
- * Example:
- * CALL AddStaff('John Doe', 'johndoe@example.com', 'password123', 'DEPT001', 'MBBS', 50000.00, 'Doctor', 1);
- */
+-- Drop existing procedures to avoid conflicts
 DROP PROCEDURE IF EXISTS AddStaff;
-DROP PROCEDURE IF EXISTS GetDoctorSchedulesByManager;
-DROP PROCEDURE IF EXISTS GetAllDoctorsWorkloadByManager;
-DROP PROCEDURE IF EXISTS GetJobHistoryByManager;
-DROP PROCEDURE IF EXISTS GetDoctorWorkloadByManager;
+DROP PROCEDURE IF EXISTS DeleteStaffByAdmin;
+DROP PROCEDURE IF EXISTS GetAllDoctorsWorkload;
+DROP PROCEDURE IF EXISTS GetDoctorSchedules;
+DROP PROCEDURE IF EXISTS GetDoctorWorkload;
+DROP PROCEDURE IF EXISTS GetJobHistory;
+DROP PROCEDURE IF EXISTS GetPatientTreatmentHistory;
+DROP PROCEDURE IF EXISTS SearchPatientByNameOrID;
+DROP PROCEDURE IF EXISTS UpdateStaffInfo;
+DROP PROCEDURE IF EXISTS GetDoctorWorkload;
 
+
+DROP FUNCTION IF EXISTS IsDoctorUnderManager;
+
+-- Create function to check if a doctor is supervised by a specific manager
+DELIMITER //
+
+CREATE FUNCTION IsDoctorUnderManager(
+    p_doctor_id INT,
+    p_manager_id INT
+) RETURNS BOOLEAN
+READS SQL DATA
+BEGIN
+    DECLARE is_supervised BOOLEAN;
+
+    -- Check if the doctor is supervised by the manager
+    SELECT EXISTS (
+        SELECT 1
+        FROM staff
+        WHERE staff_id = p_doctor_id
+        AND manager_id = p_manager_id
+    ) INTO is_supervised;
+
+    RETURN is_supervised;  -- Return true if the doctor is under the manager's supervision
+END //
+
+DELIMITER ;
+
+-- Procedure to add a new staff member with manager restrictions
 DELIMITER //
 
 CREATE PROCEDURE AddStaff (
@@ -40,16 +56,16 @@ BEGIN
     -- Fetch the role of the manager/admin performing the operation
     SELECT job_type INTO v_user_role FROM staff_credentials WHERE staff_id = p_manager_id;
 
-    -- Check if the role is Manager and restrict the job_type
+    -- Manager can only add doctors
     IF v_user_role = 'Manager' AND p_job_type <> 'Doctor' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Managers can only add Doctors';
     ELSE
-        -- Insert into the staff table
+        -- Insert into staff table
         INSERT INTO staff (staff_name, department_id, manager_id, qualification, salary, job_type, start_date)
         VALUES (p_staff_name, p_department_id, p_manager_id, p_qualification, p_salary, p_job_type, NOW());
 
-        -- Insert into the staff_credentials table
+        -- Insert into staff_credentials table
         SET @staff_id = LAST_INSERT_ID();
         INSERT INTO staff_credentials (staff_id, email, password, job_type)
         VALUES (@staff_id, p_email, p_password, p_job_type);
@@ -58,72 +74,133 @@ END //
 
 DELIMITER ;
 
+-- Procedure to update staff information
 DELIMITER //
 
-CREATE PROCEDURE GetDoctorSchedulesByManager(
-    IN p_manager_id INT,
-    IN p_start_date DATETIME,
-    IN p_end_date DATETIME
+CREATE PROCEDURE UpdateStaffInfo(
+    IN p_user_role ENUM('Admin', 'Manager'),
+    IN p_user_id INT, -- Admin or Manager ID
+    IN p_staff_id INT, -- Staff ID to update
+    IN p_staff_name VARCHAR(50),
+    IN p_department_id VARCHAR(6),
+    IN p_qualification VARCHAR(50),
+    IN p_salary DECIMAL(10,2),
+    IN p_job_type ENUM('Doctor', 'Manager', 'Admin')
 )
 BEGIN
-    SELECT 
-        ds.schedule_id,
-        ds.staff_id,
-        s.staff_name,
-        ds.shift_start,
-        ds.shift_end,
-        ds.availability_status
-    FROM 
-        doctor_schedules ds
-        JOIN staff s ON ds.staff_id = s.staff_id
-    WHERE 
-        s.manager_id = p_manager_id 
-        AND ds.shift_start >= p_start_date
-        AND ds.shift_end <= p_end_date;
+    -- Declare the authorized variable at the start of the procedure
+    DECLARE authorized BOOLEAN;
+
+    -- Admin can update any staff
+    IF p_user_role = 'Admin' THEN
+        UPDATE staff
+        SET staff_name = p_staff_name,
+            department_id = p_department_id,
+            qualification = p_qualification,
+            salary = p_salary,
+            job_type = p_job_type
+        WHERE staff_id = p_staff_id;
+    ELSE
+        -- Check if the manager is authorized to update the doctor
+        SET authorized = IsDoctorUnderManager(p_staff_id, p_user_id);
+
+        -- Check authorization result
+        IF authorized THEN
+            -- If authorized, proceed with the update
+            UPDATE staff
+            SET staff_name = p_staff_name,
+                department_id = p_department_id,
+                qualification = p_qualification,
+                salary = p_salary,
+                job_type = p_job_type
+            WHERE staff_id = p_staff_id;
+        ELSE
+            -- If not authorized, return an error
+            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Not authorized to update this staff member';
+        END IF;
+    END IF;
 END //
 
 DELIMITER ;
 
+-- Procedure to delete a staff member by Admin
 DELIMITER //
 
-CREATE PROCEDURE GetAllDoctorsWorkloadByManager(
-    IN p_manager_id INT,
-    IN p_start_date DATETIME,
-    IN p_end_date DATETIME
+CREATE PROCEDURE DeleteStaffByAdmin(
+    IN p_staff_id INT
 )
 BEGIN
-    SELECT 
-        s.staff_id,
-        s.staff_name,
-        COUNT(a.appointment_id) AS total_appointments,
-        SUM(TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)) AS total_minutes
-    FROM 
-        appointments a
-    INNER JOIN 
-        staff s ON a.staff_id = s.staff_id
-    WHERE 
-        s.manager_id = p_manager_id 
-        AND a.start_time BETWEEN p_start_date AND p_end_date
-    GROUP BY s.staff_id, s.staff_name;
+    START TRANSACTION;
+    
+    -- Delete from staff_credentials table first
+    DELETE FROM staff_credentials WHERE staff_id = p_staff_id;
+
+    -- Then delete from the staff table
+    DELETE FROM staff WHERE staff_id = p_staff_id;
+
+    COMMIT;
 END //
 
 DELIMITER ;
 
-
+-- Procedure to get doctor schedules based on user role
 DELIMITER //
 
-CREATE PROCEDURE GetDoctorWorkloadByManager(
-    IN p_manager_id INT,
-    IN p_doctor_id INT,
+CREATE PROCEDURE GetDoctorSchedules(
+    IN p_user_role ENUM('Admin', 'Manager'),
+    IN p_user_id INT,
     IN p_start_date DATETIME,
     IN p_end_date DATETIME
 )
 BEGIN
-    -- First, check if the doctor is supervised by the manager
-    IF EXISTS (
-        SELECT 1 FROM staff WHERE staff_id = p_doctor_id AND manager_id = p_manager_id
-    ) THEN
-        -- Fetch the workload if the doctor is supervised
+    IF p_user_role = 'Admin' THEN
+        -- Admin can view all doctor schedules
+        SELECT 
+            ds.schedule_id,
+            ds.staff_id,
+            s.staff_name,
+            ds.shift_start,
+            ds.shift_end,
+            ds.availability_status
+        FROM 
+            doctor_schedules ds
+            JOIN staff s ON ds.staff_id = s.staff_id
+        WHERE 
+            ds.shift_start >= p_start_date
+            AND ds.shift_end <= p_end_date;
+    ELSE
+        -- Manager can only view schedules of doctors they supervise
+        SELECT 
+            ds.schedule_id,
+            ds.staff_id,
+            s.staff_name,
+            ds.shift_start,
+            ds.shift_end,
+            ds.availability_status
+        FROM 
+            doctor_schedules ds
+            JOIN staff s ON ds.staff_id = s.staff_id
+        WHERE 
+            s.manager_id = p_user_id 
+            AND ds.shift_start >= p_start_date
+            AND ds.shift_end <= p_end_date;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Procedure to get the workload of all doctors based on user role
+DELIMITER //
+
+CREATE PROCEDURE GetAllDoctorsWorkload(
+    IN p_user_role ENUM('Admin', 'Manager'),
+    IN p_user_id INT,  -- admin or manager ID
+    IN p_start_date DATETIME,
+    IN p_end_date DATETIME
+)
+BEGIN
+    IF p_user_role = 'Admin' THEN
+        -- Admin: Return workload for all doctors
         SELECT 
             s.staff_id,
             s.staff_name,
@@ -134,52 +211,140 @@ BEGIN
         INNER JOIN 
             staff s ON a.staff_id = s.staff_id
         WHERE 
-            s.manager_id = p_manager_id 
-            AND s.staff_id = p_doctor_id
+            a.start_time BETWEEN p_start_date AND p_end_date
+        GROUP BY s.staff_id, s.staff_name;
+    ELSE
+        -- Manager: Return workload only for doctors they supervise
+        SELECT 
+            s.staff_id,
+            s.staff_name,
+            COUNT(a.appointment_id) AS total_appointments,
+            SUM(TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)) AS total_minutes
+        FROM 
+            appointments a
+        INNER JOIN 
+            staff s ON a.staff_id = s.staff_id
+        WHERE 
+            s.manager_id = p_user_id 
             AND a.start_time BETWEEN p_start_date AND p_end_date
         GROUP BY s.staff_id, s.staff_name;
-
-        -- If no appointments, return a message for no workload
-        IF ROW_COUNT() = 0 THEN
-            SELECT 'no_workload' AS error_message;
-        END IF;
-    ELSE
-        -- If the doctor is not supervised by the manager, return a different message
-        SELECT 'not_supervised' AS error_message;
     END IF;
 END //
 
 DELIMITER ;
 
+-- Procedure to get workload of a specific doctor
+DELIMITER //
 
-
-DELIMITER $$
-
-CREATE PROCEDURE GetJobHistoryByManager(
-    IN p_staff_id INT,
-    IN p_manager_id INT
+CREATE PROCEDURE GetDoctorWorkload(
+    IN p_user_role ENUM('Admin', 'Manager'),
+    IN p_user_id INT,  -- admin or manager ID
+    IN p_doctor_id INT, -- doctor ID
+    IN p_start_date DATETIME,
+    IN p_end_date DATETIME
 )
 BEGIN
-    SELECT 
-        jh.staff_name, 
-        jh.department_id, 
-        d.department_name, 
-        jh.manager_id, 
-        s.staff_name AS manager_name, 
-        jh.qualification, 
-        jh.salary, 
-        jh.job_type, 
-        jh.updated_at
-    FROM 
-        job_history jh
-    LEFT JOIN 
-        departments d ON jh.department_id = d.department_id
-    LEFT JOIN 
-        staff s ON jh.manager_id = s.staff_id
-    WHERE 
-        jh.staff_id = p_staff_id 
-        AND jh.manager_id = p_manager_id;
-END $$
+    IF p_user_role = 'Admin' THEN
+        -- Admin: Can view any doctor's workload
+        SELECT 
+            s.staff_id,
+            s.staff_name,
+            COUNT(a.appointment_id) AS total_appointments,
+            SUM(TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)) AS total_minutes
+        FROM 
+            appointments a
+        INNER JOIN 
+            staff s ON a.staff_id = s.staff_id
+        WHERE 
+            s.staff_id = p_doctor_id
+            AND a.start_time BETWEEN p_start_date AND p_end_date
+        GROUP BY s.staff_id, s.staff_name;
+    ELSE
+        -- Manager: Can only view doctors under their supervision
+        IF IsDoctorUnderManager(p_doctor_id, p_user_id) THEN
+            SELECT 
+                s.staff_id,
+                s.staff_name,
+                COUNT(a.appointment_id) AS total_appointments,
+                SUM(TIMESTAMPDIFF(MINUTE, a.start_time, a.end_time)) AS total_minutes
+            FROM 
+                appointments a
+            INNER JOIN 
+                staff s ON a.staff_id = s.staff_id
+            WHERE 
+                s.staff_id = p_doctor_id
+                AND a.start_time BETWEEN p_start_date AND p_end_date
+            GROUP BY s.staff_id, s.staff_name;
+        ELSE
+            -- Error if the manager does not supervise the doctor
+            SELECT 'not_supervised' AS error_message;
+        END IF;
+    END IF;
+END //
+
+DELIMITER ;
+
+-- Procedure to get job history of staff based on user role
+
+DELIMITER //
+
+CREATE PROCEDURE GetJobHistory(
+    IN p_user_role ENUM('Admin', 'Manager'),
+    IN p_user_id INT, -- Admin or Manager ID
+    IN p_staff_id INT -- Staff ID whose job history is being viewed
+)
+BEGIN
+    -- Admin: Can view job history of any staff
+    IF p_user_role = 'Admin' THEN
+        -- Fetch job history for Admin
+        SELECT 
+            jh.staff_name, 
+            jh.department_id, 
+            d.department_name, 
+            jh.manager_id, 
+            s.staff_name AS manager_name, 
+            jh.qualification, 
+            jh.salary, 
+            jh.job_type, 
+            jh.updated_at
+        FROM 
+            job_history jh
+        LEFT JOIN 
+            departments d ON jh.department_id = d.department_id
+        LEFT JOIN 
+            staff s ON jh.manager_id = s.staff_id
+        WHERE 
+            jh.staff_id = p_staff_id;  -- Filter by staff ID
+
+    ELSE
+        -- Manager: Can view job history only for doctors under their supervision
+        IF IsDoctorUnderManager(p_staff_id, p_user_id) THEN
+            -- Fetch job history for Manager
+            SELECT 
+                jh.staff_name, 
+                jh.department_id, 
+                d.department_name, 
+                jh.manager_id, 
+                s.staff_name AS manager_name, 
+                jh.qualification, 
+                jh.salary, 
+                jh.job_type, 
+                jh.updated_at
+            FROM 
+                job_history jh
+            LEFT JOIN 
+                departments d ON jh.department_id = d.department_id
+            LEFT JOIN 
+                staff s ON jh.manager_id = s.staff_id
+            WHERE 
+                jh.staff_id = p_staff_id;  -- Filter by staff ID
+        ELSE
+            -- Return an error if the manager does not supervise the staff
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'You do not supervise this staff member.';
+        END IF;
+    END IF;
+END //
 
 DELIMITER ;
 

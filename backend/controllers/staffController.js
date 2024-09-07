@@ -1,27 +1,10 @@
 const mysql = require("../config/db");
-const mongoClient = require("../config/mongoDb");
 const bcrypt = require("bcryptjs");
 
-// Get all staff
-exports.getAllStaff = async (req, res) => {
-    try {
-        const [staff] = await mysql.promise().query("SELECT * FROM StaffDetails");
-        res.json(staff);
-    } catch (error) {
-        console.error("Error fetching staff details:", error.message);
-        res.status(500).json({ message: "Failed to retrieve staff details.", error: error.message });
-    }
-};
-
-// Add a new staff for manager
+// Add a new staff for manager DONE
 exports.addStaff = async (req, res) => {
     const { name, email, department_id, qualification, salary, job_type } = req.body;
-    const manager_id = req.user.user_id; // Manager/Admin ID from token after authentication
-
-    // Check if all necessary fields are provided
-    if (!name || !email || !department_id || !qualification || !salary || !job_type) {
-        return res.status(400).json({ message: "All fields are required" });
-    }
+    const manager_id = req.user.user_id;
 
     try {
         // Check if email already exists (optional, for better error handling)
@@ -33,11 +16,6 @@ exports.addStaff = async (req, res) => {
         if (existingStaff.length > 0) {
             return res.status(400).json({ message: "Email already exists" });
         }
-
-        // Log the values to make sure they are being passed correctly
-        console.log("Values being passed to AddStaff procedure: ", {
-            name, email, department_id, qualification, salary, job_type, manager_id
-        });
 
         // Hash the password dynamically or generate one
         const hashedPassword = await bcrypt.hash("password1234", 10); // Change this if necessary
@@ -69,11 +47,38 @@ exports.addStaff = async (req, res) => {
         return res.status(500).json({ message: "Failed to add staff.", error: error.message });
     }
 };
-// View staff by department (Admin can view all, Manager can view supervised)
+
+//Get all staff (Admin sees all, Manager sees only supervised) DONE
+exports.getAllStaff = async (req, res) => {
+    const role = req.user.role; // 'Admin' or 'Manager'
+    const user_id = req.user.user_id; // Manager ID or Admin ID
+
+    try {
+        let query;
+        let params;
+
+        if (role === 'Admin') {
+            query = "SELECT * FROM StaffDetails"; 
+            params = [];
+        } else if (role === 'Manager') {
+            query = "SELECT * FROM StaffDetails WHERE manager_id = ?"; 
+            params = [user_id];
+        } else {
+            return res.status(403).json({ message: "You do not have permission to view staff details." });
+        }
+
+        const [staff] = await mysql.promise().query(query, params);
+        res.json(staff);
+    } catch (error) {
+        console.error("Error fetching staff details:", error.message);
+        res.status(500).json({ message: "Failed to retrieve staff details.", error: error.message });
+    }
+};
+
+// View staff by department
 exports.getStaffByDepartment = async (req, res) => {
-    const { department_id } = req.query;  // Get department ID from query
-    const role = req.user.role;  // Get user role from the token
-    const manager_id = req.user.user_id;  // Get manager ID from the token
+    const { department_id } = req.query;  // Get department ID from query params
+    const { role, user_id } = req.user;  // Get role and user ID from the token
 
     try {
         let query;
@@ -84,9 +89,9 @@ exports.getStaffByDepartment = async (req, res) => {
             query = `SELECT * FROM StaffByDepartment WHERE department_id = ?`;
             params = [department_id];
         } else if (role === 'Manager') {
-            // Manager can view only staff they supervise
+            // Manager can only view staff they supervise
             query = `SELECT * FROM StaffByDepartment WHERE department_id = ? AND manager_id = ?`;
-            params = [department_id, manager_id];
+            params = [department_id, user_id];
         } else {
             return res.status(403).json({ message: "You do not have permission to view staff by department." });
         }
@@ -104,19 +109,39 @@ exports.getStaffByDepartment = async (req, res) => {
     }
 };
 
+
 // Filter staff by name
 exports.getStaffByName = async (req, res) => {
-  const { order = 'ASC' } = req.query;
-  try {
-    const [rows] = await mysql.promise().query(`SELECT * FROM staff ORDER BY staff_name ${order}`);
-    res.json(rows);
-  } catch (error) {
-    console.error("Error fetching staff by name:", error);
-    res.status(500).json({ message: "Failed to retrieve staff by name." });
-  }
+    const { order = 'ASC' } = req.query;  // Get sorting order (default to ASC)
+    const { role, user_id } = req.user;   // Get role and user ID from token
+
+    try {
+        let query = 'SELECT * FROM staff';
+        let params = [];
+
+        // If the user is a Manager, restrict them to the staff they supervise
+        if (role === 'Manager') {
+            query += ' WHERE manager_id = ?';
+            params.push(user_id);
+        }
+
+        // Add sorting order
+        query += ` ORDER BY staff_name ${order}`;
+
+        const [staff] = await mysql.promise().query(query, params);
+
+        if (staff.length === 0) {
+            return res.status(404).json({ message: "No staff found." });
+        }
+
+        res.json(staff);
+    } catch (error) {
+        console.error("Error fetching staff by name:", error.message);
+        res.status(500).json({ message: "Failed to retrieve staff by name.", error: error.message });
+    }
 };
 
-// Update staff information
+// Update staff information DONE
 exports.updateStaff = async (req, res) => {
     const { id } = req.params; // Staff ID
     const { name, department_id, qualification, salary, job_type } = req.body;
@@ -146,15 +171,18 @@ exports.updateStaff = async (req, res) => {
     }
 };
 
-
-// Delete a staff member
+// Delete a staff member DONE
 exports.deleteStaff = async (req, res) => {
-    const { id } = req.params;  // Staff ID from request params
+    const { id } = req.params;  // Staff ID
+    const role = req.user.role;  // Get user role from token
+
+    // Only Admin can delete staff
+    if (role !== 'Admin') {
+        return res.status(403).json({ message: "Only Admin can delete staff." });
+    }
 
     try {
-        // Call the MySQL procedure to delete the staff member
         await mysql.promise().query(`CALL DeleteStaffByAdmin(?)`, [id]);
-
         res.status(200).json({ message: `Staff with ID ${id} deleted successfully.` });
     } catch (error) {
         console.error("Error deleting staff:", error.message);
@@ -173,7 +201,7 @@ exports.getAllDepartments = async (req, res) => {
     }
 };
 
-// View Doctor's Schedules for a Given Duration (Admin and Manager)
+// View Doctor's Schedules for a Given Duration (Admin and Manager) DONE
 exports.getDoctorSchedules = async (req, res) => {
     const user_id = req.user.user_id;  // Manager/Admin ID from token
     const role = req.user.role;  // Role from token (Admin/Manager)
@@ -197,7 +225,7 @@ exports.getDoctorSchedules = async (req, res) => {
     }
 };
 
-// View workload of all doctors for both Admin and Manager
+// View workload of all doctors for both Admin and Manager DONE
 exports.getAllDoctorsWorkload = async (req, res) => {
     const { start_date, end_date } = req.query;
     const user_id = req.user.user_id; // Admin or Manager ID from token
@@ -221,7 +249,7 @@ exports.getAllDoctorsWorkload = async (req, res) => {
     }
 };
 
-// View workload of a specific doctor for both Admin and Manager
+// View workload of a specific doctor for both Admin and Manager DONE
 exports.getDoctorWorkload = async (req, res) => {
     const { doctor_id } = req.params;
     const { start_date, end_date } = req.query;
@@ -255,21 +283,22 @@ exports.getDoctorWorkload = async (req, res) => {
         res.status(500).json({ message: "Failed to retrieve doctor's workload.", error: error.message });
     }
 };
-//view Job history
+
+//view Job history DONE
 exports.getJobHistory = async (req, res) => {
-    const { staff_id } = req.params; // Staff ID from request params
+    const { doctor_id } = req.params; // Staff ID from request params
     const user_role = req.user.role; // Get user role from token (Admin or Manager)
     const user_id = req.user.user_id; // Get user ID (admin or manager)
-
+    console.log('Doctor ID:', doctor_id); // Log doctor_id to verify it's correct
     try {
         // Call the stored procedure with the appropriate parameters
         const [history] = await mysql.promise().query(
             `CALL GetJobHistory(?, ?, ?)`,
-            [user_role, user_id, staff_id]
+            [user_role, user_id, doctor_id]
         );
 
         // Check if any job history was found
-        if (history.length === 0) {
+        if (history.length === [0][0]) {
             return res.status(404).json({ message: "No job history found for this staff member." });
         }
 
@@ -280,29 +309,29 @@ exports.getJobHistory = async (req, res) => {
     }
 };
 
-exports.searchPatient = async (req, res) => {
-    const search_value = req.query.q; // 'q' is the query parameter (name or ID)
+//Search patient by name or id
+exports.searchPatientByNameOrID = async (req, res) => {
+    const { search_value } = req.query; // Get the search value from query params
 
     try {
-        // Call the stored procedure
-        const [patients] = await mysql.promise().query(
-            `CALL SearchPatientByNameOrID(?)`,
-            [search_value]
-        );
+        const query = `
+            SELECT * FROM PatientDetails 
+            WHERE patient_name LIKE CONCAT('%', ?, '%') OR patient_id = ?
+        `;
+        const [patients] = await mysql.promise().query(query, [search_value, search_value]);
 
-        // Check if any patients were found
         if (patients.length === 0) {
-            return res.status(404).json({ message: "No patients found with the given name or ID." });
+            return res.status(404).json({ message: "No patient found." });
         }
 
-        res.json(patients[0]);
+        res.json(patients);
     } catch (error) {
-        console.error("Error searching for patients:", error.message);
-        res.status(500).json({ message: "Failed to search for patients.", error: error.message });
+        console.error("Error searching for patient:", error.message);
+        res.status(500).json({ message: "Failed to search for patient.", error: error.message });
     }
 };
 
-// View a specific patient's treatment history or all patients' treatment history
+// View a specific patient's treatment history or all patients' treatment history DONE
 exports.getPatientTreatmentHistory = async (req, res) => {
     const { patient_id } = req.params;  // Extract patient ID from the route parameter (0 for all patients)
     const { start_date, end_date } = req.query;  // Extract the start and end date from query parameters
@@ -316,6 +345,7 @@ exports.getPatientTreatmentHistory = async (req, res) => {
             [user_role, user_id, patient_id || 0, start_date, end_date]
         );
 
+        console.log("result: ", treatmentHistory);
         // Check if any treatments were found
         if (treatmentHistory.length === 0) {
             return res.status(404).json({ message: "No treatment history found within the specified duration." });
@@ -327,5 +357,4 @@ exports.getPatientTreatmentHistory = async (req, res) => {
         res.status(500).json({ message: "Failed to fetch treatment history.", error: error.message });
     }
 };
-
 

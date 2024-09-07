@@ -209,12 +209,6 @@ CREATE TABLE performance_rating (
     performance_rating DECIMAL(3, 2) NOT NULL
 ) ENGINE=InnoDB;
 
--- departments table
-CREATE TABLE departments (
-    department_id INT AUTO_INCREMENT PRIMARY KEY,
-    department_name VARCHAR(100) NOT NULL
-);
-
 ALTER TABLE performance_rating 
 ADD CONSTRAINT uq_appointment_id 
 UNIQUE (appointment_id);
