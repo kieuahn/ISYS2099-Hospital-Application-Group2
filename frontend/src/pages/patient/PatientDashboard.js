@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // import Appointments from '../../components/Appointments'; // Import the Appointments component
-import Treatments from '../../components/Treatments'; // Import the Treatments component
+import Treatments from './Treatments'; // Import the Treatments component
 
 const PatientDashboard = () => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -29,11 +29,7 @@ const PatientDashboard = () => {
         </nav>
       </div>
 
-      <div className="w-3/4 p-4">
-        {/* {activeSection === 'profile' && <MyProfile />} Your existing profile component */}
-        {/* {activeSection === 'appointments' && <Appointments />} Render Appointments component */}
-        {activeSection === 'treatments' && <Treatments />} {/* Render Treatments component */}
-      </div>
+
     </div>
   );
 };

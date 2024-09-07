@@ -18,13 +18,13 @@ const RoleRouting = () => {
 
   // Redirect based on role
   switch (auth.role) {
-    case "patient":
+    case "Patient":
       return <PatientDashboard />;
-    case "doctor":
+    case "Doctor":
       return <DoctorDashboard />;
-    case "manager":
+    case "Manager":
       return <ManagerDashboard />;
-    case "admin":
+    case "Admin":
       return <AdminDashboard />;
     default:
       return <ErrorPage />;

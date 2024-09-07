@@ -13,6 +13,7 @@ import PatientDashboard from "./pages/patient/PatientDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
+import Treatments from "./pages/patient/Treatments";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/dashboard" element={<RoleRouting />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
+          <Route path="/patient/records" element={<Treatments />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
           <Route path="/manager/dashboard" element={<ManagerDashboard />} />

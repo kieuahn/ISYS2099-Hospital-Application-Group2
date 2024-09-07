@@ -28,7 +28,7 @@ export default function UserMenu() {
                         Settings
                     </a>
                 </MenuItem>
-                {auth && auth.role === "admin" && (
+                {auth && auth.role === "Admin" && (
                     <MenuItem>
                         <a href="/admin" className="block px-4 py-2 text-sm text-gray-700">
                             Admin Dashboard
