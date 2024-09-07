@@ -151,10 +151,6 @@ CREATE TABLE treatments (
 ) ENGINE=INNODB;
 
 ALTER TABLE treatments 
-ADD CONSTRAINT uq_treatments_appointment_id 
-UNIQUE (appointment_id);
-
-ALTER TABLE treatments 
 ADD CONSTRAINT fk_treatment_appointment 
 FOREIGN KEY (appointment_id) 
 REFERENCES appointments(appointment_id)
