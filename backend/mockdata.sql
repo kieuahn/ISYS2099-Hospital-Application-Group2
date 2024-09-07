@@ -76,13 +76,6 @@ VALUES
 -- Insert into doctor_schedules
 INSERT INTO doctor_schedules (staff_id, shift_start, shift_end, availability_status)
 VALUES 
-    -- Doctor 3's schedule
-    (3, '2024-08-25 08:00:00', '2024-08-25 09:00:00', 'Available'), 
-    (3, '2024-08-25 10:00:00', '2024-08-25 11:00:00', 'Available'), 
-
-    -- Doctor 4's schedule
-    (4, '2024-08-25 09:00:00', '2024-08-25 10:00:00', 'Busy'), 
-    (4, '2024-08-25 11:00:00', '2024-08-25 12:00:00', 'Available'); 
 
     -- Doctor 1's schedule
     (1, '2024-08-25 08:00:00', '2024-08-25 09:00:00', 'Available'), 
