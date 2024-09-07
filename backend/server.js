@@ -13,7 +13,7 @@ const staffRoutes = require('./routes/staffRoutes');
 require("dotenv").config();
 dotenv.config();
 
-// connectMongoDB();
+connectMongoDB();
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const app = express();

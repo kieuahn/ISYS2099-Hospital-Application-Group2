@@ -13,10 +13,6 @@ DROP TABLE IF EXISTS staff_credentials;
 DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS patients;
 DROP TABLE IF EXISTS patient_credentials;
-DROP TABLE IF EXISTS staff_credentials;
-
-
--- Patient table-- 
 
 -- Patients Table
 CREATE TABLE patients (
@@ -86,6 +82,12 @@ REFERENCES departments(department_id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
+ALTER TABLE staff 
+ADD CONSTRAINT fk_manager_id 
+FOREIGN KEY (manager_id)
+REFERENCES staff(staff_id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- Staff Credentials Table
 CREATE TABLE staff_credentials (
