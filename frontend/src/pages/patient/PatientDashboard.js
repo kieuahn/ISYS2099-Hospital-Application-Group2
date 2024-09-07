@@ -3,7 +3,7 @@ import axios from 'axios';
 import DatePicker from "react-datepicker"; // Importing date picker for better date selection
 import "react-datepicker/dist/react-datepicker.css"; // Importing styles for date picker
 import "./PatientDashboard.css" // Importing the CSS file
-import DoctorCard from './DoctorCards'; // Adjust the path as necessary
+import DoctorCard from './DoctorCard'; // Adjust the path as necessary
 
 const PatientDashboard = () => {
   const [patientData, setPatientData] = useState(null);
