@@ -19,15 +19,17 @@ const login = async (req, res) => {
          role = 'Patient'; 
       } else {
          // If not a patient, check in the staff_credentials table
-         query = "SELECT * FROM staff_credentials WHERE email = ?";
+         query = "SELECT sc.*, s.job_type FROM staff_credentials sc JOIN staff s ON sc.staff_id = s.staff_id WHERE sc.email = ?";
          const [staffRows] = await mysql.promise().query(query, [email]);
          
          if (staffRows.length === 0) {
+            console.log("No staff found with this email.");
             return res.status(400).json({ message: "Invalid email" });
          }
 
          user = staffRows[0];
-         role = user.job_type; // Ensure 'role' exists in staff_credentials table
+         console.log("User found:", user);
+         role = user.job_type; 
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
@@ -37,10 +39,14 @@ const login = async (req, res) => {
       }
 
       const token = jwt.sign(
-         { user_id: user.patient_id || user.staff_id, role: role }, // Use patient_id for patients and staff_id for staff
+         { user_id: user.patient_id || user.staff_id, role: role }, // Include role in the token
          process.env.JWT_SECRET,
          { expiresIn: "1h" }
       );
+
+      // Log the role and token
+      console.log("Generated token:", token);
+      console.log("User role:", role);
 
       res.json({ token, role });
    } catch (error) {

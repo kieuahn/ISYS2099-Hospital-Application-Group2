@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const authMiddleware = (allowedRoles) => {
+const authMiddleware = (allowedRoles = []) => {
   return (req, res, next) => {
     const authHeader = req.headers.authorization;
 
@@ -17,6 +17,9 @@ const authMiddleware = (allowedRoles) => {
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded; // Attaches decoded token to req object
+
+      console.log("User role:", req.user.role);  // Debugging 
+      console.log("Allowed roles:", allowedRoles);  // Debugging 
 
       // Check if the user has one of the allowed roles
       if (!allowedRoles.includes(req.user.role)) {
