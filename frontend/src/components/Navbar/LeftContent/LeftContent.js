@@ -1,21 +1,43 @@
 import React from 'react';
 import { classNames } from '../../../utils/classNames'; // Ensure you create the utility file
+import { Link } from 'react-router-dom';
 
-const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Team', href: '#', current: false },
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Calendar', href: '#', current: false },
-];
 
-export default function LeftContent() {
+const LeftContent = ({ auth }) => {
+    const role = auth?.role || "";
+
+    const navigation = {
+        admin: [
+            { name: 'Dashboard', href: '/admin/dashboard', current: true },
+            { name: 'Manage Users', href: '/admin/users', current: false },
+            { name: 'Reports', href: '/admin/reports', current: false }
+        ],
+        doctor: [
+            { name: 'Dashboard', href: '/doctor/dashboard', current: true },
+            { name: 'Patient Records', href: '/doctor/patients', current: false },
+            { name: 'Appointments', href: '/doctor/appointments', current: false }
+        ],
+        manager: [
+            { name: 'Dashboard', href: '/manager/dashboard', current: true },
+            { name: 'Staff Management', href: '/manager/staff', current: false },
+            { name: 'Workload Reports', href: '/manager/reports', current: false }
+        ],
+        patient: [
+            { name: 'Dashboard', href: '/patient/dashboard', current: true },
+            { name: 'Appointments', href: '/patient/appointments', current: false },
+            { name: 'Medical Records', href: '/patient/records', current: false }
+        ]
+    }
+
+    const currentNav = navigation[role] || [];
+
     return (
         <div className="hidden sm:ml-6 sm:block">
             <div className="flex space-x-4">
-                {navigation.map((item) => (
-                    <a
+                {currentNav.map((item) => (
+                    <Link
                         key={item.name}
-                        href={item.href}
+                        to={item.href}
                         aria-current={item.current ? 'page' : undefined}
                         className={classNames(
                             item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
@@ -23,9 +45,11 @@ export default function LeftContent() {
                         )}
                     >
                         {item.name}
-                    </a>
+                    </Link>
                 ))}
             </div>
         </div>
     );
-}
+};
+
+export default LeftContent;
