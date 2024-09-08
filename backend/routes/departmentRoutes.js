@@ -7,7 +7,7 @@ const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // get all departments
-router.get("/departments", authMiddleware(["admin", "manager"]), departmentController.getAllDepartments);
+router.get("/all-departments", authMiddleware(["admin", "manager"]), departmentController.getAllDepartments);
 
 // get all departments by id
 router.get("/departments/:id", authMiddleware(["admin", "manager"]), departmentController.getDepartmentById);

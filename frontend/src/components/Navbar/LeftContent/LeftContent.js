@@ -6,23 +6,21 @@ import { Link } from 'react-router-dom';
 const LeftContent = ({ auth }) => {
     const role = auth?.role || "";
 
-    const navigation = {
-        admin: [
-            { name: 'Dashboard', href: '/admin/dashboard', current: true },
-            { name: 'Manage Users', href: '/admin/users', current: false },
-            { name: 'Reports', href: '/admin/reports', current: false }
+const navigation = {
+        Admin: [
+            { name: 'Dashboard', href: '/dashboard', current: true },
+            { name: 'Manage Users', href: 'admin/staff-list', current: false },
         ],
-        doctor: [
+        Doctor: [
             { name: 'Dashboard', href: '/doctor/dashboard', current: true },
             { name: 'Patient Records', href: '/doctor/patients', current: false },
             { name: 'Appointments', href: '/doctor/appointments', current: false }
         ],
-        manager: [
-            { name: 'Dashboard', href: '/manager/dashboard', current: true },
-            { name: 'Staff Management', href: '/manager/staff', current: false },
-            { name: 'Workload Reports', href: '/manager/reports', current: false }
+        Manager: [
+            { name: 'Dashboard', href: '/dashboard', current: true },
+            { name: 'Staff Management', href: '/manager/staff-list', current: false },
         ],
-        patient: [
+        Patient: [
             { name: 'Dashboard', href: '/patient/dashboard', current: true },
             { name: 'Appointments', href: '/patient/appointments', current: false },
             { name: 'Medical Records', href: '/patient/records', current: false }

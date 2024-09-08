@@ -348,4 +348,69 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+
+CREATE PROCEDURE GetPatientTreatmentHistory(
+    IN p_user_role ENUM('Admin', 'Manager'),
+    IN p_user_id INT, -- manager or admin ID
+    IN p_patient_id INT,
+    IN p_start_date DATETIME,
+    IN p_end_date DATETIME
+)
+BEGIN
+    IF p_user_role = 'Admin' THEN
+        -- Admin: Return all treatment history
+        SELECT 
+            p.patient_name,
+            t.treatment_id,
+            t.diagnosis,
+            t.treatment_procedure,
+            t.medication,
+            t.instruction,
+            t.treatment_date,
+            a.purpose AS appointment_purpose,
+            a.start_time AS appointment_start,
+            a.end_time AS appointment_end,
+            s.staff_name AS doctor_name
+        FROM 
+            treatments t
+        JOIN 
+            appointments a ON t.appointment_id = a.appointment_id
+        JOIN 
+            staff s ON a.staff_id = s.staff_id
+        JOIN 
+            patients p ON t.patient_id = p.patient_id
+        WHERE 
+            t.patient_id = p_patient_id 
+            AND a.start_time BETWEEN p_start_date AND p_end_date;
+    ELSE
+        -- Manager: Return only treatments under doctors they supervise
+        SELECT 
+            p.patient_name,
+            t.treatment_id,
+            t.diagnosis,
+            t.treatment_procedure,
+            t.medication,
+            t.instruction,
+            t.treatment_date,
+            a.purpose AS appointment_purpose,
+            a.start_time AS appointment_start,
+            a.end_time AS appointment_end,
+            s.staff_name AS doctor_name
+        FROM 
+            treatments t
+        JOIN 
+            appointments a ON t.appointment_id = a.appointment_id
+        JOIN 
+            staff s ON a.staff_id = s.staff_id
+        JOIN 
+            patients p ON t.patient_id = p.patient_id
+        WHERE 
+            t.patient_id = p_patient_id 
+            AND a.start_time BETWEEN p_start_date AND p_end_date
+            AND s.manager_id = p_user_id;  -- Manager's restriction
+    END IF;
+END //
+
+DELIMITER ;
 

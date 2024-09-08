@@ -109,10 +109,9 @@ exports.getStaffByDepartment = async (req, res) => {
     }
 };
 
-
 // Filter staff by name
 exports.getStaffByName = async (req, res) => {
-    const { order = 'ASC' } = req.query;  // Get sorting order (default to ASC)
+    const { order = 'ASC', name = '' } = req.query;  // Get sorting order (default to ASC)
     const { role, user_id } = req.user;   // Get role and user ID from token
 
     try {
@@ -123,6 +122,16 @@ exports.getStaffByName = async (req, res) => {
         if (role === 'Manager') {
             query += ' WHERE manager_id = ?';
             params.push(user_id);
+        }
+
+        // Add name filtering
+        if (name) {
+            if (role === 'Manager') {
+                query += ' AND staff_name LIKE ?';  // Add the name filter for Manager
+            } else {
+                query += ' WHERE staff_name LIKE ?';  // Add the name filter for Admin
+            }
+            params.push(`%${name}%`);
         }
 
         // Add sorting order
@@ -331,6 +340,23 @@ exports.searchPatientByNameOrID = async (req, res) => {
     }
 };
 
+// Get all patients
+exports.getAllPatients = async (req, res) => {
+    try {
+        const [patients] = await mysql.promise().query('SELECT * FROM patients');
+        if (patients.length === 0) {
+            console.log("No patients found");
+            return res.status(404).json({ message: "No patients found." });
+        }
+
+        console.log("Patients data:", patients);
+        res.json(patients);
+    } catch (error) {
+        console.error("Error fetching patients:", error); // Full error log
+        res.status(500).json({ message: "Failed to retrieve patients.", error: error.message });
+    }
+};
+
 // View a specific patient's treatment history or all patients' treatment history DONE
 exports.getPatientTreatmentHistory = async (req, res) => {
     const { patient_id } = req.params;  // Extract patient ID from the route parameter (0 for all patients)
@@ -358,3 +384,72 @@ exports.getPatientTreatmentHistory = async (req, res) => {
     }
 };
 
+// View doctor performance ratings (Admin can see all, Manager can only see their supervised doctors)
+exports.getDoctorPerformanceRating = async (req, res) => {
+    const { role, user_id } = req.user; // Get the user's role and ID from the token
+
+    try {
+        let query;
+        let params = [];
+
+        if (role === 'Admin') {
+            // Admin can view all doctor performance ratings
+            query = `
+                SELECT d.staff_name AS doctor_name, pr.performance_rating, pr.appointment_id
+                FROM performance_rating pr
+                JOIN staff d ON pr.doctor_id = d.staff_id
+            `;
+        } else if (role === 'Manager') {
+            // Manager can only view ratings of doctors they supervise
+            query = `
+                SELECT d.staff_name AS doctor_name, pr.performance_rating, pr.appointment_id
+                FROM performance_rating pr
+                JOIN staff d ON pr.doctor_id = d.staff_id
+                WHERE d.manager_id = ?
+            `;
+            params = [user_id];
+        } else {
+            return res.status(403).json({ message: "You do not have permission to view doctor performance ratings." });
+        }
+
+        const [ratings] = await mysql.promise().query(query, params);
+
+        if (ratings.length === 0) {
+            return res.status(404).json({ message: "No performance ratings found." });
+        }
+
+        res.json(ratings);
+    } catch (error) {
+        console.error("Error fetching doctor performance ratings:", error.message);
+        res.status(500).json({ message: "Failed to fetch doctor performance ratings.", error: error.message });
+    }
+};
+
+exports.getDoctorDetails = async (req, res) => {
+  const { doctor_id } = req.params;
+  try {
+    const [doctorDetails] = await mysql.promise().query('SELECT * FROM staff WHERE staff_id = ?', [doctor_id]);
+    if (!doctorDetails.length) {
+      return res.status(404).json({ message: "Doctor not found." });
+    }
+    res.status(200).json(doctorDetails[0]);
+  } catch (error) {
+    console.error("Error fetching doctor details:", error.message);
+    res.status(500).json({ message: "Failed to retrieve doctor details.", error: error.message });
+  }
+};
+
+exports.getPaymentReport = async (req, res) => {
+  try {
+    const [paymentReport] = await mysql.promise().query('SELECT * FROM PatientPaymentReport');
+
+    if (paymentReport.length === 0) {
+      return res.status(404).json({ message: "No payment data found." });
+    }
+
+    res.status(200).json(paymentReport);
+  } catch (error) {
+    console.error("Error fetching payment report:", error.message);
+    res.status(500).json({ message: "Failed to retrieve payment report.", error: error.message });
+  }
+};

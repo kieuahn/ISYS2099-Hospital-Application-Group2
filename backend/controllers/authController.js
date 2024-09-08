@@ -41,7 +41,7 @@ const login = async (req, res) => {
       const token = jwt.sign(
          { user_id: user.patient_id || user.staff_id, role: role }, // Include role in the token
          process.env.JWT_SECRET,
-         { expiresIn: "1h" }
+         { expiresIn: "5h" }
       );
 
       // Log the role and token

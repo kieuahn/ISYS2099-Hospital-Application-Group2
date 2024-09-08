@@ -45,3 +45,15 @@ SELECT
     address
 FROM 
     patients;
+    
+CREATE VIEW PatientPaymentReport AS
+SELECT
+    p.patient_id,
+    p.patient_name,
+    SUM(a.payment_amount) AS total_payment
+FROM
+    patients p
+JOIN
+    appointments a ON p.patient_id = a.patient_id
+GROUP BY
+    p.patient_id, p.patient_name;
