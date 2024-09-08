@@ -7,7 +7,6 @@ import RoleRouting from "./utils/RoleRouting";
 import ErrorPage from "./pages/ErrorPage";
 import NavBar from "./components/Navbar/Navbar";
 import AddDoctor from "./pages/admin/AddDoctor";
-import StaffList from "./pages/admin/StaffList";
 import Schedules from "./pages/doctor/Schedules";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -15,6 +14,9 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import ManagerDashboard from "./pages/ManagerDashboard";
 import PatientAppointmentList from "./pages/patient/PatientAppointmentList";
 import PatientProfile from "./pages/patient/PatientProfile";
+import DoctorList from "./pages/patient/DoctorList";
+import StaffList from "./pages/admin/StaffList";
+import BookingForm from "./pages/patient/BookingForm";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
           <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
           <Route path="/manager/dashboard" element={<ManagerDashboard />} />
           <Route path="/patient/appointments" element={<PatientAppointmentList />} />
+          <Route path="/patient/doctors" element={<DoctorList />} />
+          <Route path="/patient/booking-form/:doctor_id" element={<BookingForm />} />
           <Route path="/error" element={<ErrorPage />} />
           <Route path="/patient/profile" element={<PatientProfile />} />
           <Route path="/admin/add-doctor" element={<AddDoctor />} />

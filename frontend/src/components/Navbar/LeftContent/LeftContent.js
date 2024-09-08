@@ -25,7 +25,8 @@ const LeftContent = ({ auth }) => {
         Patient: [
             { name: 'Dashboard', href: '/patient/dashboard', current: true },
             { name: 'Appointments', href: '/patient/appointments', current: false },
-            { name: 'Medical Records', href: '/patient/records', current: false }
+            { name: 'Doctor List', href: '/patient/doctors', current: false },
+            { name: 'Book Appointment', href: '/patient/booking-form/:doctor_id', current: false }
         ]
     }
 

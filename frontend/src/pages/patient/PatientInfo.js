@@ -1,9 +1,6 @@
 import React from 'react';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
@@ -22,11 +19,11 @@ const PatientInfo = ({ info }) => {
           {/* Profile Picture */}
           <Avatar
             alt="#"
-            src="/static/images/avatar/1.jpg"  
-            sx={{ width: 100, height: 100, mb: 2 }}  
+            src="/static/images/avatar/1.jpg"
+            sx={{ width: 100, height: 100, mb: 2 }}
           />
           {/* Patient Info */}
-          <Box sx={{ width: '100%' }}> 
+          <Box sx={{ width: '100%' }}>
             <Box display="flex" justifyContent="space-between" sx={{ mb: 1 }}>
               <Typography variant="body1" fontWeight="bold">
                 Name
@@ -98,12 +95,8 @@ const PatientInfo = ({ info }) => {
           </Box>
         </Stack>
       </CardContent>
-      <Divider sx={{ my: 2 }} />
-      <CardActions>
-        <Button variant="outlined" fullWidth sx={{ borderRadius: 2 }}>
-          Upload Picture
-        </Button>
-      </CardActions>
+
+
     </Card>
   );
 };

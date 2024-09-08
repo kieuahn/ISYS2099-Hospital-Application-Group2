@@ -12,7 +12,7 @@ const RightContent = () => {
 
             {auth ? (
                 <>
-                    <span className="text-white mr-4">Welcome, {auth.name} {auth.role}!</span>
+                    <span className="text-white mr-4">Welcome, {auth.role}!</span>
                     <UserMenu />
                 </>
             ) : (

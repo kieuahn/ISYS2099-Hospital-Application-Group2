@@ -9,7 +9,7 @@ const StaffList = () => {
   const [filter, setFilter] = useState({ department: "", name: "", role: "" });
   const { auth } = useContext(AuthContext);
 
- useEffect(() => {
+  useEffect(() => {
     const fetchStaff = async () => {
       try {
         const response = await api.get("/admin/staff");
@@ -24,20 +24,20 @@ const StaffList = () => {
   }, [auth.token]);
 
   const handleDelete = async (id) => {
-      try {
-          const response = await api.delete(`/admin/delete-staff/${id}`);
-          if (response.status === 200) {
-              setStaff(staff.filter((s) => s.staff_id !== id));
-              alert("Staff deleted successfully.");
-          } else {
-              alert("Failed to delete staff. Please try again.");
-          }
-      } catch (error) {
-          console.error("Error deleting staff:", error);
-          alert(`Failed to delete staff: ${error.response?.data?.message || "An error occurred"}`);
+    try {
+      const response = await api.delete(`/admin/delete-staff/${id}`);
+      if (response.status === 200) {
+        setStaff(staff.filter((s) => s.staff_id !== id));
+        alert("Staff deleted successfully.");
+      } else {
+        alert("Failed to delete staff. Please try again.");
       }
+    } catch (error) {
+      console.error("Error deleting staff:", error);
+      alert(`Failed to delete staff: ${error.response?.data?.message || "An error occurred"}`);
+    }
   };
-  
+
   const handleEdit = (staff) => {
     setSelectedStaff(staff);
     setIsEditing(true);
