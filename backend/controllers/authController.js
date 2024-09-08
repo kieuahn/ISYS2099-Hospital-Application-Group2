@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mysql = require("../config/db");
+const {poolPatient, poolShare} = require("../config/db");
 
 const login = async (req, res) => {
    const { email, password } = req.body;
@@ -12,7 +12,7 @@ const login = async (req, res) => {
 
       // First, check if the user is a patient
       query = "SELECT * FROM patient_credentials WHERE email = ?";
-      const [patientRows] = await mysql.promise().query(query, [email]);
+      const [patientRows] = await poolPatient.query(query, [email]);
 
       if (patientRows.length > 0) {
          user = patientRows[0];
@@ -20,7 +20,7 @@ const login = async (req, res) => {
       } else {
          // If not a patient, check in the staff_credentials table
          query = "SELECT sc.*, s.job_type FROM staff_credentials sc JOIN staff s ON sc.staff_id = s.staff_id WHERE sc.email = ?";
-         const [staffRows] = await mysql.promise().query(query, [email]);
+         const [staffRows] = await poolShare.query(query, [email]);
          
          if (staffRows.length === 0) {
             console.log("No staff found with this email.");
@@ -62,7 +62,7 @@ const signup = async (req, res) => {
    let connection;
 
    try {
-      connection = await mysql.promise().getConnection();
+      connection = await poolPatient.promise().getConnection();
       await connection.beginTransaction(); // Start a transaction
 
       // Check if the email already exists

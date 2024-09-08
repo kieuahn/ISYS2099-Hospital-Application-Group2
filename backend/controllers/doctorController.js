@@ -1,4 +1,4 @@
-const mysql = require("../config/db");
+const {poolDoctor} = require("../config/db");
 const treatmentDetails = require("../models/treatmentDetails");
 
 // View doctor's upcoming and proceeding appointment
@@ -8,7 +8,7 @@ const doctorViewUpcomingProceedingAppointment = async (req, res) => {
     try {
         const query = `SELECT appointment_id, purpose, status, start_time FROM appointments 
         WHERE staff_id = ? AND (status = 'upcoming' OR status = 'proceeding')`;
-        const [appointments] = await mysql.promise().query(query, [doctor_id])
+        const [appointments] = await poolDoctor.query(query, [doctor_id])
 
         if (appointments.length === 0) {
             return res.status(200).json({message: "No upcoming appointments"})
@@ -28,7 +28,7 @@ const doctorViewCompletedAppointment = async (req, res) => {
     try {
         const query = `SELECT appointment_id, purpose, status, start_time FROM appointments 
         WHERE staff_id = ? AND (status = 'completed')`;
-        const [appointments] = await mysql.promise().query(query, [doctor_id])
+        const [appointments] = await poolDoctor.query(query, [doctor_id])
 
         if (appointments.length === 0) {
             return res.status(200).json({message: "No past appointments"})
@@ -48,7 +48,7 @@ const doctorViewTreatmentNote = async (req, res) => {
     try {
         const query = `SELECT * FROM treatments 
         WHERE appointment_id = ?`;
-        const [note] = await mysql.promise().query(query, [appointment_id])
+        const [note] = await poolDoctor.query(query, [appointment_id])
 
         if (note.length === 0) {
             return res.status(200).json({message: "No notes found"});
@@ -87,7 +87,7 @@ const doctorUpdateTreatmentNote = async (req, res) => {
 
     try {
         // Update the treatment 
-        const [result] = await mysql.promise().query(
+        const [result] = await poolDoctor.query(
             `UPDATE treatments 
              SET diagnosis = ?, 
                  treatment_procedure = ?, 
@@ -138,7 +138,7 @@ const viewDoctorSchedules = async (req, res) => {
     const doctorId = req.user.user_id; 
 
     try {
-        const [schedules] = await mysql.promise().query(
+        const [schedules] = await poolDoctor.query(
             `SELECT schedule_id, shift_start, shift_end, availability_status 
              FROM doctor_schedules 
              WHERE staff_id = ? 
@@ -168,7 +168,7 @@ const doctorAddSchedule = async (req, res) => {
     console.log(shiftStart, shiftEnd)
 
     try {
-        const [result] = await mysql.promise().query('CALL sp_add_doctor_schedule(?, ?, ?)',
+        const [result] = await poolDoctor.query('CALL sp_add_doctor_schedule(?, ?, ?)',
             [doctorId, shiftStart, shiftEnd]
         )
 
@@ -192,7 +192,7 @@ const doctorDeleteSchedule = async (req, res) => {
     const doctorId = req.user.user_id;
 
     try {
-        const [result] = await mysql.promise().query('CALL sp_delete_doctor_schedule(?, ?)', [doctorId, scheduleId]);
+        const [result] = await poolDoctor.query('CALL sp_delete_doctor_schedule(?, ?)', [doctorId, scheduleId]);
 
 
         if (result.affectedRows === 0) {

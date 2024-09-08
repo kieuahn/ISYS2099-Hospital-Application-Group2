@@ -1,97 +1,76 @@
-/**
- * Creates roles for Admin, Manager, Doctor, and Patient
- *
- * This script creates four roles and assigns them to corresponding users.
- * The roles are:
- * - admin: highest level of access
- * - manager: middle level of access
- * - doctor: limited access
- * - patient: lowest level of access
- *
- * Example:
- * Run this script in a MySQL environment to create the roles and users.
- */
-CREATE ROLE 'admin';
-CREATE ROLE 'manager';
-CREATE ROLE 'doctor';
-CREATE ROLE 'patient';
+-- PATIENT USER
+CREATE USER IF NOT EXISTS 'patient'@'%' IDENTIFIED BY 'password1234';
 
-/**
- * Creates MySQL users and assigns roles
- *
- * This script creates four users and assigns the corresponding roles to each user.
- * The users are:
- * - admin_user: has admin role
- * - manager_user: has manager role
- * - doctor_user: has doctor role
- * - patient_user: has patient role
- *
- * Example:
- * Run this script in a MySQL environment to create the users and assign roles.
- */
-CREATE USER 'admin_user'@'localhost' IDENTIFIED BY 'admin_password';
-GRANT 'admin' TO 'admin_user';
+GRANT SELECT, UPDATE ON hospital_management.patients TO 'patient'@'%';
+GRANT SELECT, INSERT, DELETE ON hospital_management.appointments TO 'patient'@'%';
+GRANT SELECT, INSERT, DELETE ON hospital_management.treatments TO 'patient'@'%';
+GRANT SELECT (staff_id, staff_name, department_id) ON hospital_management.staff TO 'patient'@'%';
+GRANT SELECT ON hospital_management.departments TO 'patient'@'%';
+GRANT SELECT ON hospital_management.doctor_schedules TO 'patient'@'%';
+GRANT SELECT ON hospital_management.get_doctors_list_available_slots TO 'patient'@'%';
+-- Grant permission for patient
+GRANT EXECUTE ON PROCEDURE hospital_management.sp_book_appointment TO 'patient'@'%';
+GRANT EXECUTE ON PROCEDURE hospital_management.sp_cancel_appointment TO 'patient'@'%';
+GRANT SELECT ON hospital_management.patient_credentials TO 'patient'@'%';
 
-CREATE USER 'manager_user'@'localhost' IDENTIFIED BY 'manager_password';
-GRANT 'manager' TO 'manager_user';
+-- SHARED USER
+CREATE USER IF NOT EXISTS 'shared_user'@'%' IDENTIFIED BY 'password1234';
+GRANT SELECT, INSERT ON staff_credentials TO 'shared_user'@'%';
+GRANT SELECT, INSERT, UPDATE ON staff TO 'shared_user'@'%';
+GRANT SELECT ON departments TO 'shared_user'@'%';
+GRANT SELECT ON doctor_schedules TO 'shared_user'@'%';
+GRANT SELECT ON appointments TO 'shared_user'@'%';
+GRANT SELECT ON job_history TO 'shared_user'@'%';
+GRANT SELECT ON patients TO 'shared_user'@'%';
+GRANT SELECT ON treatments TO 'shared_user'@'%';
+GRANT SELECT ON performance_rating TO 'shared_user'@'%';
 
-CREATE USER 'doctor_user'@'localhost' IDENTIFIED BY 'doctor_password';
-GRANT 'doctor' TO 'doctor_user';
+-- Grant permissions for views (for example, StaffDetails and StaffByDepartment)
+GRANT SELECT ON StaffDetails TO 'shared_user'@'%';
+GRANT SELECT ON StaffByDepartment TO 'shared_user'@'%';
+GRANT SELECT ON PatientDetails TO 'shared_user'@'%';
 
-CREATE USER 'patient_user'@'localhost' IDENTIFIED BY 'patient_password';
-GRANT 'patient' TO 'patient_user';
+-- Grant EXECUTE permission for procedures used by both manager and admin
+GRANT EXECUTE ON PROCEDURE GetDoctorSchedules TO 'shared_user'@'%';
+GRANT EXECUTE ON PROCEDURE GetDoctorWorkload TO 'shared_user'@'%';
+GRANT EXECUTE ON PROCEDURE UpdateStaffInfo TO 'shared_user'@'%';
+GRANT EXECUTE ON PROCEDURE GetPatientTreatmentHistory TO 'shared_user'@'%';
+GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'shared_user'@'%';
+GRANT EXECUTE ON PROCEDURE AddStaff TO 'shared_user'@'%';
 
-/**
- * Applies role automatically when the user logs in
- *
- * This script sets the default role for each user when they log in.
- * This ensures that the user has the correct level of access.
- *
- * Example:
- * Run this script in a MySQL environment to set the default roles.
- */
-SET DEFAULT ROLE 'admin' FOR 'admin_user'@'localhost';
-SET DEFAULT ROLE 'manager' FOR 'manager_user'@'localhost';
-SET DEFAULT ROLE 'doctor' FOR 'doctor_user'@'localhost';
-SET DEFAULT ROLE 'patient' FOR 'patient_user'@'localhost';
+-- ADMIN
+CREATE USER IF NOT EXISTS 'Admin'@'%' IDENTIFIED BY 'password1234';
 
-/**
- * Grants privileges to different roles in the hospital management system.
- *
- * This script grants privileges to four roles: admin, manager, doctor, and patient.
- * Each role has specific privileges to ensure proper access control and security.
- */
+GRANT SELECT, INSERT ON staff_credentials TO 'Admin'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON staff TO 'Admin'@'%';
+GRANT SELECT ON departments TO 'Admin'@'%';
+GRANT SELECT ON doctor_schedules TO 'Admin'@'%';
+GRANT SELECT ON appointments TO 'Admin'@'%';
+GRANT SELECT ON job_history TO 'Admin'@'%';
+GRANT SELECT ON patients TO 'Admin'@'%';
+GRANT SELECT ON treatments TO 'Admin'@'%';
+GRANT SELECT ON performance_rating TO 'Admin'@'%';
 
-/**
- * Admin role has full control over all tables and procedures.
- *
- * Example: The admin user can perform any operation on any table or procedure in the hospital_management database.
- */
-GRANT ALL PRIVILEGES ON hospital_management.* TO 'admin';
+GRANT SELECT ON StaffDetails TO 'Admin'@'%';
+GRANT SELECT ON StaffByDepartment TO 'Admin'@'%';
+GRANT SELECT ON PatientDetails TO 'Admin'@'%';
 
-/**
- * Manager role can manage doctors and appointments they supervise.
- *
- * Example: The manager user can view, insert, and update staff information, view patient information, execute the AddDoctor procedure, and view appointment information.
- */
-GRANT SELECT, INSERT, UPDATE ON hospital_management.staff TO 'manager';
-GRANT SELECT ON hospital_management.patients TO 'manager';
-GRANT EXECUTE ON PROCEDURE hospital_management.AddDoctor TO 'manager';
-GRANT SELECT ON hospital_management.appointments TO 'manager';
+GRANT EXECUTE ON PROCEDURE GetDoctorSchedules TO 'Admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetDoctorWorkload TO 'Admin'@'%';
+GRANT EXECUTE ON PROCEDURE UpdateStaffInfo TO 'Admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetPatientTreatmentHistory TO 'Admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'Admin'@'%';
+GRANT EXECUTE ON PROCEDURE AddStaff TO 'Admin'@'%';
 
-/**
- * Doctor role can view patients they treat and update treatments.
- *
- * Example: The doctor user can view and update patient information, view and update treatment information, and view appointment information.
- */
-GRANT SELECT, UPDATE ON hospital_management.patients TO 'doctor';
-GRANT SELECT, UPDATE ON hospital_management.treatments TO 'doctor';
-GRANT SELECT ON hospital_management.appointments TO 'doctor';
+-- DOCTOR
+CREATE USER IF NOT EXISTS 'doctor'@'%' IDENTIFIED BY 'password1234';
 
-/**
- * Patient role can view their appointments and treatments.
- *
- * Example: The patient user can view their appointment information and treatment information.
- */
-GRANT SELECT ON hospital_management.appointments TO 'patient';
-GRANT SELECT ON hospital_management.treatments TO 'patient';
+GRANT SELECT ON appointments TO 'doctor'@'%';
+GRANT SELECT, UPDATE ON treatments TO 'doctor'@'%';
+GRANT SELECT, INSERT, DELETE ON doctor_schedules TO 'doctor'@'%';
+
+GRANT EXECUTE ON PROCEDURE sp_add_doctor_schedule TO 'doctor'@'%';
+GRANT EXECUTE ON PROCEDURE sp_delete_doctor_schedule TO 'doctor'@'%';
+
+
+FLUSH PRIVILEGES;
