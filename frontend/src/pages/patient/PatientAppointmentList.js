@@ -7,12 +7,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import api from '../../utils/api'; // Ensure your API helper like Axios is imported
-import CustomPositionPage from '../../components/Layout/CustomPositionPage';
+import Button from '@mui/joy/Button';
+import ToggleButtonGroup from '@mui/joy/ToggleButtonGroup';
 import Box from '@mui/material/Box';
-
+import api from '../../utils/api'; // Ensure your API helper is imported
+import CustomPositionPage from '../../components/Layout/CustomPositionPage';
+import Typography from '@mui/joy/Typography';
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -41,16 +41,16 @@ const PatientAppointmentList = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [tabIndex, setTabIndex] = useState(0); // 0 for upcoming, 1 for past appointments
+  const [view, setView] = useState('upcoming'); // Track the current view (upcoming or past)
 
-  // Fetch appointments based on the selected tab (upcoming or past)
+  // Fetch appointments based on the selected view (upcoming or past)
   useEffect(() => {
     const fetchAppointments = async () => {
       setLoading(true);
       setError(null);
 
-      // Determine the endpoint based on the selected tab
-      const endpoint = tabIndex === 0 ? '/patient/upcoming-appointment' : '/patient/past-appointment';
+      // Determine the endpoint based on the selected view
+      const endpoint = view === 'upcoming' ? '/patient/upcoming-appointment' : '/patient/past-appointment';
 
       try {
         const response = await api.get(endpoint); // Fetch from the respective API route
@@ -63,10 +63,12 @@ const PatientAppointmentList = () => {
     };
 
     fetchAppointments();
-  }, [tabIndex]); // Re-fetch when tab changes
+  }, [view]); // Re-fetch when view changes
 
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue); // Switch between upcoming and past appointments
+  const handleViewChange = (event, newValue) => {
+    if (newValue !== null) {
+      setView(newValue); // Switch between upcoming and past appointments
+    }
   };
 
   if (loading) {
@@ -80,15 +82,22 @@ const PatientAppointmentList = () => {
   return (
     <>
     <CustomPositionPage>
-      {/* Tabs for switching between upcoming and past appointments */}
+      {/* Toggle Button Group */}
+      <Typography level="h2" sx={{paddingBottom : '16px' }}>Appointment</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'left', paddingBottom : '16px' }}>
      
-      <Tabs value={tabIndex} onChange={handleTabChange} centered>
-        <Tab label="Upcoming Appointments" />
-        <Tab label="Past Appointments" />
-      </Tabs>
-     
+        <ToggleButtonGroup
+          variant="outlined"
+          value={view}
+          onChange={handleViewChange}
+          exclusive // Ensures only one button is selected at a time
+        >
+          <Button value="upcoming">Upcoming</Button>
+          <Button value="past">Past</Button>
+        </ToggleButtonGroup>
+      </Box>
 
-      <Box sx={{ padding: '24px' }} />
+      
 
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
