@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mysql = require("../config/db");
+const {poolPatient} = require("../config/db");
 
 const login = async (req, res) => {
    const { email, password } = req.body;
@@ -12,7 +12,7 @@ const login = async (req, res) => {
 
       // First, check if the user is a patient
       query = "SELECT * FROM patient_credentials WHERE email = ?";
-      const [patientRows] = await mysql.promise().query(query, [email]);
+      const [patientRows] = await poolPatient.query(query, [email]);
 
       if (patientRows.length > 0) {
          user = patientRows[0];

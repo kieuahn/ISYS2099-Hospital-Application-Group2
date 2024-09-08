@@ -1,4 +1,4 @@
-const mysql = require("../config/db")
+const {poolPatient} = require("../config/db")
 const treatmentDetails = require("../models/treatmentDetails")
 
 
@@ -9,7 +9,7 @@ const getPatientProfile = async (req, res) => {
         const patient_id = req.user.user_id;
 
         const query = 'SELECT * FROM patients WHERE patient_id = ?';
-        const [patient] = await mysql.promise().query(query, [patient_id]); // Retrieve the patient from table Patient
+        const [patient] = await poolPatient.query(query, [patient_id]); // Retrieve the patient from table Patient
 
         // Check if the query statement return any row
         if (patient.length === 0) {
@@ -44,7 +44,7 @@ const editPatientProfile = async (req, res) => {
         const query = `UPDATE patients 
                     SET patient_name = ?, allergies = ?, contact_number = ?, dob = ?, gender = ?, address = ?
                     WHERE patient_id = ?`
-        const [result] = await mysql.promise().query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id])
+        const [result] = await poolPatient.promise().query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id])
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Cannot update patient's profile" })
@@ -64,7 +64,7 @@ const patientViewUpcomingProceedingAppointments = async (req, res) => {
         const query = `SELECT * FROM appointments 
                         WHERE patient_id = ? 
                         AND (status LIKE "upcoming" OR status LIKE "proceeding");`
-        const [appointments] = await mysql.promise().query(query, [patient_id])
+        const [appointments] = await poolPatient.query(query, [patient_id])
 
         if (appointments.length === 0) {
             return res.status(200).json({ message: "No upcoming appointment yet" })
@@ -86,7 +86,7 @@ const patientViewHistoryAppointments = async (req, res) => {
         const query = `SELECT * FROM appointments 
                         WHERE patient_id = ? 
                         AND (status LIKE "completed" OR status LIKE "cancelled");`
-        const [appointments] = await mysql.promise().query(query, [patient_id])
+        const [appointments] = await poolPatient.query(query, [patient_id])
 
         if (appointments.length === 0) {
             return res.status(200).json({ message: "No past appointment" })
@@ -107,7 +107,7 @@ const patientViewTreatmentList = async (req, res) => {
     try {
         const query = `SELECT treatment_id, patient_id, appointment_id, diagnosis, treatment_date FROM treatments 
                         WHERE patient_id = ?;`
-        const [treatments] = await mysql.promise().query(query, [patient_id])
+        const [treatments] = await poolPatient.query(query, [patient_id])
 
         if (treatments.length === 0) {
             return res.status(200).json({ message: "No past treatment" })
@@ -130,7 +130,7 @@ const patientViewTreatmentNote = async (req, res) => {
         const query = `SELECT * FROM treatments  
             WHERE appointment_id = ? AND patient_id = ?`
 
-        const [notesList] = await mysql.promise().query(query, [appointment_id, patient_id])
+        const [notesList] = await poolPatient.query(query, [appointment_id, patient_id])
         if (notesList.length === 0) {
             return res.status(200).json({ message: "No treatments yet" })
         }
@@ -166,7 +166,7 @@ const patientViewDoctorList = async (req, res) => {
     WHERE job_type = 'Doctor';`
 
     try {
-        [doctorRows] = await mysql.promise().query(query)
+        [doctorRows] = await poolPatient.promise().query(query)
 
         return res.status(200).json(doctorRows)
     }
@@ -184,7 +184,7 @@ const patientViewDoctorBookingForm = async (req, res) => {
     const doctor_id = req.params.doctor_id;  
 
     try {
-        const [slots] = await mysql.promise().query('SELECT * FROM get_doctors_list_available_slots WHERE staff_id = ? AND date = ?', [doctor_id, date]);
+        const [slots] = await poolPatient.promise().query('SELECT * FROM get_doctors_list_available_slots WHERE staff_id = ? AND date = ?', [doctor_id, date]);
 
         return res.status(200).json(slots)
     }
@@ -204,7 +204,7 @@ const patientBookAppointment = async (req, res) => {
 
     const [start_time, end_time] = timeRange.split(' - ').map(time => time.trim());
     try {
-        const [bookingResult] = await mysql.promise().query(
+        const [bookingResult] = await poolPatient.promise().query(
             'CALL sp_book_appointment(?, ?, ?, ?, ?, ?, @treatmentId)',
             [patient_id, doctor_id, purpose, appointment_date, start_time, end_time]
         );
@@ -216,7 +216,7 @@ const patientBookAppointment = async (req, res) => {
         }
 
         // Extract treatmentId from output parameter from the sp_book_appointment
-        const [[{ treatmentId }]] = await mysql.promise().query('SELECT @treatmentId AS treatmentId');
+        const [[{ treatmentId }]] = await poolPatient.promise().query('SELECT @treatmentId AS treatmentId');
         
         if (treatmentId === 0) {
             return res.status(400).json({ message: 'Failed to book appointment. Treatment ID is 0.' });
@@ -242,7 +242,7 @@ const patientCancelAppointment = async (req, res) => {
     const appointment_id = req.params.appointment_id;
 
     try {
-        const [cancelResult] = await mysql.promise().query('CALL sp_cancel_appointment(?, @treatmentId)',
+        const [cancelResult] = await poolPatient.promise().query('CALL sp_cancel_appointment(?, @treatmentId)',
             appointment_id
         )
 
@@ -252,7 +252,7 @@ const patientCancelAppointment = async (req, res) => {
         }
 
         // Extract treatmentId from output parameter from the sp_book_appointment
-        const [[{ treatmentId }]] = await mysql.promise().query('SELECT @treatmentId AS treatmentId');
+        const [[{ treatmentId }]] = await poolPatient.promise().query('SELECT @treatmentId AS treatmentId');
 
         // Delete treatment details
         await treatmentDetails.deleteOne({ treatment_id: treatmentId });

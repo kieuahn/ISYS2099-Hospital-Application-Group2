@@ -1,4 +1,5 @@
-const mysql = require("../config/db");
+const {poolShare, poolAdmin} = require("../config/db");
+
 const bcrypt = require("bcryptjs");
 
 // Add a new staff for manager DONE
@@ -8,7 +9,7 @@ exports.addStaff = async (req, res) => {
 
     try {
         // Check if email already exists (optional, for better error handling)
-        const [existingStaff] = await mysql.promise().query(
+        const [existingStaff] = await poolShare.query(
             "SELECT * FROM staff_credentials WHERE email = ?",
             [email]
         );
@@ -25,7 +26,7 @@ exports.addStaff = async (req, res) => {
             CALL AddStaff(?, ?, ?, ?, ?, ?, ?, ?);
         `;
 
-        await mysql.promise().query(query, [
+        await poolShare.query(query, [
             name,
             email,
             hashedPassword,
@@ -67,7 +68,7 @@ exports.getAllStaff = async (req, res) => {
             return res.status(403).json({ message: "You do not have permission to view staff details." });
         }
 
-        const [staff] = await mysql.promise().query(query, params);
+        const [staff] = await poolShare.query(query, params);
         res.json(staff);
     } catch (error) {
         console.error("Error fetching staff details:", error.message);
@@ -96,7 +97,7 @@ exports.getStaffByDepartment = async (req, res) => {
             return res.status(403).json({ message: "You do not have permission to view staff by department." });
         }
 
-        const [staff] = await mysql.promise().query(query, params);
+        const [staff] = await poolShare.query(query, params);
 
         if (staff.length === 0) {
             return res.status(404).json({ message: "No staff found in this department." });
@@ -128,7 +129,7 @@ exports.getStaffByName = async (req, res) => {
         // Add sorting order
         query += ` ORDER BY staff_name ${order}`;
 
-        const [staff] = await mysql.promise().query(query, params);
+        const [staff] = await poolShare.query(query, params);
 
         if (staff.length === 0) {
             return res.status(404).json({ message: "No staff found." });
@@ -153,7 +154,7 @@ exports.updateStaff = async (req, res) => {
             CALL UpdateStaffInfo(?, ?, ?, ?, ?, ?, ?, ?);
         `;
 
-        await mysql.promise().query(query, [
+        await poolShare.query(query, [
             user_role,
             user_id,
             id,
@@ -182,7 +183,7 @@ exports.deleteStaff = async (req, res) => {
     }
 
     try {
-        await mysql.promise().query(`CALL DeleteStaffByAdmin(?)`, [id]);
+        await poolAdmin.promise().query(`CALL DeleteStaffByAdmin(?)`, [id]);
         res.status(200).json({ message: `Staff with ID ${id} deleted successfully.` });
     } catch (error) {
         console.error("Error deleting staff:", error.message);
@@ -193,7 +194,7 @@ exports.deleteStaff = async (req, res) => {
 //Get all deparments name
 exports.getAllDepartments = async (req, res) => {
     try {
-        const [departments] = await mysql.promise().query("SELECT * FROM departments");
+        const [departments] = await poolShare.query("SELECT * FROM departments");
         res.json(departments);
     } catch (error) {
         console.error("Error fetching departments:", error);
@@ -208,7 +209,7 @@ exports.getDoctorSchedules = async (req, res) => {
     const { start_date, end_date } = req.query;
 
     try {
-        const [schedules] = await mysql.promise().query(
+        const [schedules] = await poolShare.query(
             "CALL GetDoctorSchedules(?, ?, ?, ?)", 
             [role, user_id, start_date, end_date]
         );
@@ -232,7 +233,7 @@ exports.getAllDoctorsWorkload = async (req, res) => {
     const role = req.user.role; // 'Admin' or 'Manager' from token
 
     try {
-        const [workload] = await mysql.promise().query(
+        const [workload] = await poolShare.query(
             `CALL GetAllDoctorsWorkload(?, ?, ?, ?)`,
             [role, user_id, start_date, end_date]
         );
@@ -257,7 +258,7 @@ exports.getDoctorWorkload = async (req, res) => {
     const role = req.user.role; // 'Admin' or 'Manager' from token
 
     try {
-        const [workload] = await mysql.promise().query(
+        const [workload] = await poolShare.query(
             `CALL GetDoctorWorkload(?, ?, ?, ?, ?)`,
             [role, user_id, doctor_id, start_date, end_date]
         );
@@ -292,7 +293,7 @@ exports.getJobHistory = async (req, res) => {
     console.log('Doctor ID:', doctor_id); // Log doctor_id to verify it's correct
     try {
         // Call the stored procedure with the appropriate parameters
-        const [history] = await mysql.promise().query(
+        const [history] = await poolShare.query(
             `CALL GetJobHistory(?, ?, ?)`,
             [user_role, user_id, doctor_id]
         );
@@ -318,7 +319,7 @@ exports.searchPatientByNameOrID = async (req, res) => {
             SELECT * FROM PatientDetails 
             WHERE patient_name LIKE CONCAT('%', ?, '%') OR patient_id = ?
         `;
-        const [patients] = await mysql.promise().query(query, [search_value, search_value]);
+        const [patients] = await poolShare.query(query, [search_value, search_value]);
 
         if (patients.length === 0) {
             return res.status(404).json({ message: "No patient found." });
@@ -340,7 +341,7 @@ exports.getPatientTreatmentHistory = async (req, res) => {
 
     try {
         // Call the stored procedure with role-based logic
-        const [treatmentHistory] = await mysql.promise().query(
+        const [treatmentHistory] = await poolShare.query(
             `CALL GetPatientTreatmentHistory(?, ?, ?, ?, ?)`,
             [user_role, user_id, patient_id || 0, start_date, end_date]
         );
