@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import api from '../../utils/api';
 const PatientProfile = () => {
     const [info, setInfo] = useState({
-        name: '',
+        patient_name: '',
          dob: '',
         allergies: '',
         gender: '',
@@ -25,23 +25,33 @@ const PatientProfile = () => {
     const [editing, setEditing] = useState(false);
     
     useEffect(() => {
-        const fetchInfo = async () => {
-            setLoading(true);
-            setError(null);
+      const fetchInfo = async () => {
+        setLoading(true);
+        setError(null);
     
-            try {
-                // Fetch the patient profile from the API
-                const response = await api.get('/patient/patient-profile');
-                setInfo(response.data);
-            } catch (err) {
-                setError('Error fetching profile.');
-            } finally {
-                setLoading(false);
+        try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                throw new Error("Token is missing or expired");
             }
-        };
+            const response = await api.get('/patient/patient-profile', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            setInfo(response.data);
+        } catch (err) {
+            setError('Error fetching profile.');
+            console.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     
-        fetchInfo();
-    }, []);
+  
+      fetchInfo();
+  }, []);
+  
     
     const handleProfileUpdate = async (updatedInfo) => {
         try {
@@ -51,6 +61,7 @@ const PatientProfile = () => {
         } catch (err) {
             setError('Error updating profile.');
         }
+        
     }
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
@@ -59,7 +70,7 @@ const PatientProfile = () => {
     <Box sx={{ flexGrow: 1, p: 3, maxWidth: '1200px', mx: 'auto'}}> 
     <Stack spacing={4}>
       <div>
-        <Typography variant="h4" sx={{ mb: 3 }}>Account</Typography>
+        <Typography variant="h4" sx={{ ml: 10 }}>Account</Typography>
       </div>
       <Divider />
       <Grid

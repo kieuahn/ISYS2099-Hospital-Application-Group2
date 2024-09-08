@@ -9,9 +9,16 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Grid from '@mui/material/Grid';
+import dayjs from 'dayjs'; // Import dayjs
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const PatientDetailsForm = ({ info, onProfileUpdate }) => {
-  const [formState, setFormState] = useState(info); // Local state for form inputs
+    const [formState, setFormState] = useState({
+        ...info,
+        dob: info.dob ? dayjs(info.dob) : null // Initialize Date of Birth using dayjs if available
+      });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,6 +26,13 @@ const PatientDetailsForm = ({ info, onProfileUpdate }) => {
       ...formState,
       [name]: value,
     });
+  };
+
+  const handleDateChange = (newDate) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      dob: newDate ? newDate.format('YYYY-MM-DD') : null,  // Format the date for MySQL
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -33,29 +47,32 @@ const PatientDetailsForm = ({ info, onProfileUpdate }) => {
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
-            {/* First Name */}
+            {/* Name */}
             <Grid item md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>First Name</InputLabel>
+                <InputLabel>Name</InputLabel>
                 <OutlinedInput
                   name="name"
-                  value={formState.name}
+                  value={formState.patient_name}
                   onChange={handleInputChange}
-                  label="First Name"
+                  label="Name"
                 />
               </FormControl>
             </Grid>
-            {/* Email */}
+             {/* Date of Birth */}
             <Grid item md={6} xs={12}>
-              <FormControl fullWidth>
-                <InputLabel>Email Address</InputLabel>
-                <OutlinedInput
-                  name="email"
-                  value={formState.email}
-                  onChange={handleInputChange}
-                  label="Email Address"
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Date of Birth"
+                  value={formState.dob ? dayjs(formState.dob) : null}  // Convert to dayjs object
+                  onChange={handleDateChange}
+                  renderInput={(params) => (
+                    <FormControl fullWidth>
+                      <OutlinedInput {...params.inputProps} />
+                    </FormControl>
+                  )}
                 />
-              </FormControl>
+              </LocalizationProvider>
             </Grid>
             {/* Phone Number */}
             <Grid item md={6} xs={12}>
@@ -78,6 +95,17 @@ const PatientDetailsForm = ({ info, onProfileUpdate }) => {
                   value={formState.gender}
                   onChange={handleInputChange}
                   label="Gender"
+                />
+              </FormControl>
+            </Grid>
+            <Grid item md={6} xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Allergies</InputLabel>
+                <OutlinedInput
+                  name="allergies"
+                  value={formState.allergies}
+                  onChange={handleInputChange}
+                  label="Allergies"
                 />
               </FormControl>
             </Grid>
