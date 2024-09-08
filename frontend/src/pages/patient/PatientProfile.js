@@ -14,7 +14,7 @@ const PatientProfile = () => {
          dob: '',
         allergies: '',
         gender: '',
-        phone: '',
+        contact_number: '',
         address: '',
         created: '',
         updated: '',
@@ -34,11 +34,7 @@ const PatientProfile = () => {
             if (!token) {
                 throw new Error("Token is missing or expired");
             }
-            const response = await api.get('/patient/patient-profile', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const response = await api.get('/patient/patient-profile');
             setInfo(response.data);
         } catch (err) {
             setError('Error fetching profile.');

@@ -53,9 +53,9 @@ const PatientDetailsForm = ({ info, onProfileUpdate }) => {
                 <InputLabel>Name</InputLabel>
                 <OutlinedInput
                   name="name"
-                  value={formState.patient_name}
+                  value={formState.name}
                   onChange={handleInputChange}
-                  label="Name"
+                  label="Patient Name"
                 />
               </FormControl>
             </Grid>
@@ -79,10 +79,10 @@ const PatientDetailsForm = ({ info, onProfileUpdate }) => {
               <FormControl fullWidth>
                 <InputLabel>Phone Number</InputLabel>
                 <OutlinedInput
-                  name="phone"
-                  value={formState.phone}
+                  name="contact_number"
+                  value={formState.contact_number}
                   onChange={handleInputChange}
-                  label="Phone Number"
+                  label="Contact Number"
                 />
               </FormControl>
             </Grid>

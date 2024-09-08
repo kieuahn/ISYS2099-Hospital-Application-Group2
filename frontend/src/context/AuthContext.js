@@ -1,20 +1,36 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
-import { useEffect } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [auth, setAuth] = useState(null);
+  const [auth, setAuth] = useState(null);  // Auth state
   const navigate = useNavigate();
+
+  // Check if the token is already in localStorage when the component mounts
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    const storedRole = localStorage.getItem("authRole");
+    const storedName = localStorage.getItem("authName");
+
+    if (storedToken && storedRole && storedName) {
+      // If token is found, set the auth state
+      setAuth({ token: storedToken, role: storedRole, name: storedName });
+    }
+  }, []);
 
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
       const { token, role, name } = response.data;
+
+      // Update auth state and persist to localStorage
       setAuth({ token, role, name });
-      localStorage.setItem("authToken", token); // Store token
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("authRole", role);
+      localStorage.setItem("authName", name);
+
       console.log("Navigating to dashboard...");
 
       // Dynamic navigation based on role
@@ -42,8 +58,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // Clear auth state and localStorage
     setAuth(null);
-    localStorage.removeItem("authToken"); // Remove token
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authRole");
+    localStorage.removeItem("authName");
     navigate("/login");
   };
 
@@ -55,5 +74,3 @@ export const AuthProvider = ({ children }) => {
 };
 
 export default AuthContext;
-
-

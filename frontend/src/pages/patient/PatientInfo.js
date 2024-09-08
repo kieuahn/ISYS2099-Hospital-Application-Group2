@@ -21,7 +21,7 @@ const PatientInfo = ({ info }) => {
         <Stack spacing={2} alignItems="center">
           {/* Profile Picture */}
           <Avatar
-            alt={info.name}
+            alt="#"
             src="/static/images/avatar/1.jpg"  
             sx={{ width: 100, height: 100, mb: 2 }}  
           />
@@ -32,7 +32,7 @@ const PatientInfo = ({ info }) => {
                 Name
               </Typography>
               <Typography variant="body1">
-                {info.patient_name}
+                {info.name}
               </Typography>
             </Box>
 

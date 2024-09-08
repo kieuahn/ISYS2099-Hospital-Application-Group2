@@ -1,6 +1,6 @@
 const mysql = require("../config/db")
 const treatmentDetails = require("../models/treatmentDetails")
-
+const Joi = require('joi');
 
 // Patient view their profile
 const getPatientProfile = async (req, res) => {
@@ -31,30 +31,68 @@ const getPatientProfile = async (req, res) => {
     }
 }
 
-// Edit patient profile
-const editPatientProfile = async (req, res) => {
+// // Edit patient profile
+// const editPatientProfile = async (req, res) => {
+//     const patient_id = req.user.user_id;
+//     const { name, date_of_birth, gender, address, allergies, contact_number } = req.body;
+
+//     try {
+//         if (!name || name.trim() === "") {
+//             return res.status(400).json({ error: "Name cannot be empty" })
+//         }
+
+//         const query = `UPDATE patients 
+//                     SET patient_name = ?, allergies = ?, contact_number = ?, dob = ?, gender = ?, address = ?
+//                     WHERE patient_id = ?`
+//         const [result] = await mysql.promise().query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id])
+
+//         if (result.affectedRows === 0) {
+//             return res.status(404).json({ error: "Cannot update patient's profile" })
+//         }
+//         return res.status(200).json({ message: "Update patient profile successfully" })
+//     } catch (err) {
+//         console.error("Error: ", err.stack);
+//         return res.status(500).json({ error: err.message });
+//     }
+// }
+
+// Define Joi validation schema for the profile
+const profileSchema = Joi.object({
+    name: Joi.string().required(),
+    contact_number: Joi.string().pattern(/^[\d+\-\s]{8,15}$/).required(), // Allow numbers, spaces, +, and dashes
+    date_of_birth: Joi.date().optional(),
+    gender: Joi.string().valid('Male', 'Female', 'Other').required(),
+    address: Joi.string().optional(),
+    allergies: Joi.string().optional()
+  });
+  
+  const editPatientProfile = async (req, res) => {
     const patient_id = req.user.user_id;
     const { name, date_of_birth, gender, address, allergies, contact_number } = req.body;
-
-    try {
-        if (!name || name.trim() === "") {
-            return res.status(400).json({ error: "Name cannot be empty" })
-        }
-
-        const query = `UPDATE patients 
-                    SET patient_name = ?, allergies = ?, contact_number = ?, dob = ?, gender = ?, address = ?
-                    WHERE patient_id = ?`
-        const [result] = await mysql.promise().query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id])
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "Cannot update patient's profile" })
-        }
-        return res.status(200).json({ message: "Update patient profile successfully" })
-    } catch (err) {
-        console.error("Error: ", err.stack);
-        return res.status(500).json({ error: err.message });
+  
+    // Validate the input data using Joi
+    const { error } = profileSchema.validate(req.body);
+  
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
-}
+  
+    try {
+      const query = `UPDATE patients 
+                    SET patient_name = ?, allergies = ?, contact_number = ?, dob = ?, gender = ?, address = ?
+                    WHERE patient_id = ?`;
+      const [result] = await mysql.promise().query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id]);
+  
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: "Cannot update patient's profile" });
+      }
+  
+      return res.status(200).json({ message: "Update patient profile successfully" });
+    } catch (err) {
+      console.error("Error: ", err.stack);
+      return res.status(500).json({ error: err.message });
+    }
+  };
 
 // Patient view upcoming and proceeding appointments
 const patientViewUpcomingProceedingAppointments = async (req, res) => {
