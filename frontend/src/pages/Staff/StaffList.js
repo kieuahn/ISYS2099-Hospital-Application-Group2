@@ -13,7 +13,7 @@ const StaffList = () => {
   // const [departments, setDepartments] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [newStaff, setNewStaff] = useState({
-    staff_name: '',
+    staffName: '',
     email: '',
     department_id: '',
     qualification: '',
@@ -84,22 +84,24 @@ const fetchStaff = async () => {
     }
   };
 
-const handleAddStaff = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await api.post('/staff/add-staff', newStaff, {
-      headers: { Authorization: `Bearer ${auth.token}` }, // Make sure you are sending the correct auth token
-    });
+  const handleAddStaff = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/staff/add-staff', {
+        ...newStaff,
+        name: newStaff.staffName,  // Sending 'name' to the backend as expected
+      }, {
+        headers: { Authorization: `Bearer ${auth.token}` }, // Make sure you are sending the correct auth token
+      });
 
-    // Assuming your backend returns a success message
-    setStaff([...staff, response.data]);
-    setIsAdding(false);
-    alert('Staff added successfully!');
-  } catch (error) {
-    console.error('Error adding staff:', error);
-    alert('Failed to add staff.');
-  }
-};
+      setStaff([...staff, response.data]);
+      setIsAdding(false);
+      alert('Staff added successfully!');
+    } catch (error) {
+      console.error('Error adding staff:', error);
+      alert('Failed to add staff.');
+    }
+  };
 
 const handleChange = (e) => {
   setNewStaff({ ...newStaff, [e.target.name]: e.target.value });
@@ -141,8 +143,9 @@ const handleChange = (e) => {
                 <label className="block text-gray-700">Name</label>
                 <input
                   type="text"
+                  name="staffName"  // Corrected name attribute
                   placeholder="Name"
-                  value={newStaff.name}
+                  value={newStaff.staffName}  // Corrected value
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   required
@@ -154,7 +157,8 @@ const handleChange = (e) => {
                 <label className="block text-gray-700">Email</label>
                 <input
                   type="email"
-                  value={newStaff.email}
+                  name="email"  // Corrected name attribute
+                  value={newStaff.email}  // Corrected value
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   required
@@ -166,7 +170,8 @@ const handleChange = (e) => {
                 <label className="block text-gray-700">Department</label>
                 <input
                   type="text"
-                  value={newStaff.department_id}
+                  name="department_id"  // Corrected name attribute
+                  value={newStaff.department_id}  // Corrected value
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   required
@@ -178,7 +183,8 @@ const handleChange = (e) => {
                 <label className="block text-gray-700">Qualification</label>
                 <input
                   type="text"
-                  value={newStaff.qualification}
+                  name="qualification"  // Corrected name attribute
+                  value={newStaff.qualification}  // Corrected value
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   required
@@ -190,32 +196,35 @@ const handleChange = (e) => {
                 <label className="block text-gray-700">Salary</label>
                 <input
                   type="number"
-                  value={newStaff.salary}
+                  name="salary"  // Corrected name attribute
+                  value={newStaff.salary}  // Corrected value
                   onChange={handleChange}
                   className="border p-2 rounded w-full"
                   required
                 />
               </div>
-
+              
               {/* Manager ID (Admin only) */}
               {auth.role === 'Admin' && (
                 <div className="mb-4">
                   <label className="block text-gray-700">Manager ID</label>
                   <input
                     type="text"
-                    value={newStaff.manager_id}
+                    name="manager_id"  // Corrected name attribute
+                    value={newStaff.manager_id}  // Corrected value
                     onChange={handleChange}
                     className="border p-2 rounded w-full"
                   />
                 </div>
               )}
-
+              
               {/* Job Type (Admin only) */}
               {auth.role === 'Admin' ? (
                 <div className="mb-4">
                   <label className="block text-gray-700">Job Type</label>
                   <select
-                    value={newStaff.job_type}
+                    name="job_type"  // Corrected name attribute
+                    value={newStaff.job_type}  // Corrected value
                     onChange={handleChange}
                     className="border p-2 rounded w-full"
                     required
@@ -226,8 +235,7 @@ const handleChange = (e) => {
                   </select>
                 </div>
               ) : (
-                // For Manager, job_type is fixed to "Doctor"
-                <input type="hidden" value="Doctor" />
+                <input type="hidden" name="job_type" value="Doctor" />
               )}
 
               <div className="flex justify-end">
