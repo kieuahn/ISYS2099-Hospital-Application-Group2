@@ -359,7 +359,6 @@ exports.getAllPatients = async (req, res) => {
             `;
             params.push(user_id);
         }
-
         const [patients] = await mysql.promise().query(query, params);
 
         if (patients.length === 0) {

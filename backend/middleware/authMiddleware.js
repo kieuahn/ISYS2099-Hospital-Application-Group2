@@ -18,9 +18,6 @@ const authMiddleware = (allowedRoles = []) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = decoded; // Attaches decoded token to req object
 
-      console.log("User role:", req.user.role);  // Debugging 
-      console.log("Allowed roles:", allowedRoles);  // Debugging 
-
       // Check if the user has one of the allowed roles
       // if (!allowedRoles.includes(req.user.role)) {
       //   return res.status(403).json({ message: "Forbidden: Access is denied" });
