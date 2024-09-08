@@ -1,3 +1,8 @@
+DROP USER IF EXISTS 'patient'@'%';
+DROP USER IF EXISTS 'admin'@'%';
+DROP USER IF EXISTS 'shared_user'@'%';
+DROP USER IF EXISTS 'doctor'@'%';
+
 -- PATIENT USER
 CREATE USER IF NOT EXISTS 'patient'@'%' IDENTIFIED BY 'password1234';
 
@@ -39,28 +44,28 @@ GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'shared_user'@'%';
 GRANT EXECUTE ON PROCEDURE AddStaff TO 'shared_user'@'%';
 
 -- ADMIN
-CREATE USER IF NOT EXISTS 'Admin'@'%' IDENTIFIED BY 'password1234';
+CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'password1234';
 
-GRANT SELECT, INSERT ON staff_credentials TO 'Admin'@'%';
-GRANT SELECT, INSERT, UPDATE, DELETE ON staff TO 'Admin'@'%';
-GRANT SELECT ON departments TO 'Admin'@'%';
-GRANT SELECT ON doctor_schedules TO 'Admin'@'%';
-GRANT SELECT ON appointments TO 'Admin'@'%';
-GRANT SELECT ON job_history TO 'Admin'@'%';
-GRANT SELECT ON patients TO 'Admin'@'%';
-GRANT SELECT ON treatments TO 'Admin'@'%';
-GRANT SELECT ON performance_rating TO 'Admin'@'%';
+GRANT SELECT, INSERT ON staff_credentials TO 'admin'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON staff TO 'admin'@'%';
+GRANT SELECT ON departments TO 'admin'@'%';
+GRANT SELECT ON doctor_schedules TO 'admin'@'%';
+GRANT SELECT ON appointments TO 'admin'@'%';
+GRANT SELECT ON job_history TO 'admin'@'%';
+GRANT SELECT ON patients TO 'admin'@'%';
+GRANT SELECT ON treatments TO 'admin'@'%';
+GRANT SELECT ON performance_rating TO 'admin'@'%';
 
-GRANT SELECT ON StaffDetails TO 'Admin'@'%';
-GRANT SELECT ON StaffByDepartment TO 'Admin'@'%';
-GRANT SELECT ON PatientDetails TO 'Admin'@'%';
+GRANT SELECT ON StaffDetails TO 'admin'@'%';
+GRANT SELECT ON StaffByDepartment TO 'admin'@'%';
+GRANT SELECT ON PatientDetails TO 'admin'@'%';
 
-GRANT EXECUTE ON PROCEDURE GetDoctorSchedules TO 'Admin'@'%';
-GRANT EXECUTE ON PROCEDURE GetDoctorWorkload TO 'Admin'@'%';
-GRANT EXECUTE ON PROCEDURE UpdateStaffInfo TO 'Admin'@'%';
-GRANT EXECUTE ON PROCEDURE GetPatientTreatmentHistory TO 'Admin'@'%';
-GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'Admin'@'%';
-GRANT EXECUTE ON PROCEDURE AddStaff TO 'Admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetDoctorSchedules TO 'admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetDoctorWorkload TO 'admin'@'%';
+GRANT EXECUTE ON PROCEDURE UpdateStaffInfo TO 'admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetPatientTreatmentHistory TO 'admin'@'%';
+GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'admin'@'%';
+GRANT EXECUTE ON PROCEDURE AddStaff TO 'admin'@'%';
 
 -- DOCTOR
 CREATE USER IF NOT EXISTS 'doctor'@'%' IDENTIFIED BY 'password1234';
