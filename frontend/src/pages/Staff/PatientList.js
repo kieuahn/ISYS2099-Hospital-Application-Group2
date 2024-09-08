@@ -22,6 +22,7 @@ const PatientList = () => {
       fetchPatients();
   }, []);
 
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Title */}

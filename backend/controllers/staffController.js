@@ -342,18 +342,34 @@ exports.searchPatientByNameOrID = async (req, res) => {
 
 // Get all patients
 exports.getAllPatients = async (req, res) => {
+    const { role, user_id } = req.user;
+
     try {
-        const [patients] = await mysql.promise().query('SELECT * FROM patients');
+        let query = 'SELECT * FROM patients';
+        let params = [];
+
+        if (role === 'Manager') {
+            query += `
+                WHERE patient_id IN (
+                    SELECT DISTINCT a.patient_id 
+                    FROM appointments a
+                    JOIN staff s ON a.staff_id = s.staff_id 
+                    WHERE s.manager_id = ?
+                )
+            `;
+            params.push(user_id);
+        }
+
+        const [patients] = await mysql.promise().query(query, params);
+
         if (patients.length === 0) {
-            console.log("No patients found");
             return res.status(404).json({ message: "No patients found." });
         }
 
-        console.log("Patients data:", patients);
         res.json(patients);
     } catch (error) {
-        console.error("Error fetching patients:", error); // Full error log
-        res.status(500).json({ message: "Failed to retrieve patients.", error: error.message });
+        console.error("Error fetching patients:", error.message);
+        res.status(500).json({ message: "Failed to fetch patients.", error: error.message });
     }
 };
 

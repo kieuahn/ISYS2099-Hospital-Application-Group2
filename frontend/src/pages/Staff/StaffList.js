@@ -39,7 +39,7 @@ const fetchStaff = async () => {
   // Fetch staff data when the component mounts and whenever nameOrder or filter changes
   useEffect(() => {
     fetchStaff();
-  }, [nameOrder, filter]);
+  }, [nameOrder, filter])
 
 
   // Handle staff deletion
@@ -115,8 +115,8 @@ const handleChange = (e) => {
       <div className="flex justify-between mb-6">
   <div>
     <select
-      value={filter.nameOrder}
-      onChange={(e) => setFilter({ ...filter, nameOrder: e.target.value })}
+      value={nameOrder}
+      onChange={(e) => setNameOrder(e.target.value)}  // Use setNameOrder directly
       className="border p-2 rounded mr-4"
     >
       <option value="ASC">Filter by Name (A-Z)</option>

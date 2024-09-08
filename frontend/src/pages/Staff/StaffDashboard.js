@@ -118,6 +118,12 @@ return (
             View Workload
           </button>
           <button
+            className="bg-blue-500 text-white px-4 py-2 rounded hhover:bg-blue-600"
+            onClick={handleViewPatients}
+          >
+            View Patient List
+          </button>
+          <button
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
             onClick={() => navigate("/doctor-schedules")}
           >
