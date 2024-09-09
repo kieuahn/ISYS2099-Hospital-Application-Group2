@@ -85,7 +85,10 @@ VALUES
     (4, '2024-11-24 15:00:00', '2024-11-24 15:30:00', 'Busy'),    -- Doctor 4
     (5, '2024-11-20 10:00:00', '2024-11-20 11:00:00', 'Available'), -- Doctor 5
     (5, '2024-08-05 09:30:00', '2024-11-05 10:30:00', 'Busy'),    -- Doctor 5
-    (6, '2024-11-23 12:00:00', '2024-11-23 12:45:00', 'Busy');    -- Doctor 6
+    (6, '2024-11-23 12:00:00', '2024-11-23 12:45:00', 'Busy'),	-- Doctor 6
+    (4, '2024-11-25 08:00:00', '2024-11-25 09:00:00', 'Available'), -- Doctor 4
+    (4, '2024-11-25 10:00:00', '2024-11-25 12:00:00', 'Available');        -- Doctor 4    -- Doctor 4
+    
 -- Insert into job_history
 INSERT INTO job_history (staff_id, staff_name, department_id, manager_id, qualification, salary, job_type, updated_at)
 VALUES
