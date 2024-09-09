@@ -1,46 +1,126 @@
-# ISYS2099-Hospital-Application-Group2
+![header image](assets/header.jpg)
 
+# Hospital Management System - Group 2
 
-1. **Clone the Repository:**
+A hospital management system designed to manage the activities and interactions between admin, doctors, patients, and managers efficiently.
 
-   ```bash
-   git clone https://github.com/yourusername/hospital_management.git
-   ```
-   ```bash
-   cd hospital_management/backend
-   npm install
-   ```
+---
 
+## Project Structure
 
-2. **Change the Enviroment Variables**
-    DB_HOST=localhost
-    DB_USER=root
-    DB_PASSWORD=yourpassword
-    DB_NAME=hospital_management
-    JWT_SECRET=your_jwt_secret_key
+<pre>
+<span style="color: dodgerblue;"><b>./</b></span>
+├── .vscode/
+├── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── database/
+│   │   ├── business_rule.sql
+│   │   └── table.sql
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── uploads/
+│   ├── utils/
+│   ├── .env
+│   ├── server.js
+│   └── package.json
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── pages/
+│   │   ├── styles/
+│   │   ├── utils/
+│   │   ├── App.js
+│   │   ├── index.js
+│   └── package.json
+├── .gitignore
+├── README.md
+</pre>
 
-3. **Seeding the Databas**
-    To insert mock data into your database, run:
+### Key Directories and Files
 
-   ```bash
-   cd hospital_management/backend/ultis
-   node mockData.js
-   ```
+- `backend/`: Contains the backend API logic, including configuration, controllers, models, and routes.
+- `frontend/`: React-based frontend, styled using Material UI and TailwindCSS.
+- `database/`: SQL scripts to initialize MySQL database schema and rules.
+- `server.js`: The main entry point for the backend server.
+- `App.js`: The main entry point for the React frontend.
 
-4. **Run backend**
-   ```bash
-   cd hospital_management/backend/
-   node server.js
-   ```
+---
 
-5. **Frontend Setup**
-   ```bash
-   cd ../frontend
-   npm install
-   ```
+## Technology Stack
 
-6. **Run frontend**
-   ```bash
-   cd hospital_management/frontend/
-   npm start
-   ```
+- **Database**: MySQL, MongoDB
+- **Back-end API**: NodeJS, Express, Mongoose
+- **Front-end**: React, Material UI, TailwindCSS
+
+---
+
+## Installation
+
+### Prerequisites
+
+- Node.js
+- MySQL Community Server
+- MongoDB Community Server
+
+### Steps
+
+1. **MySQL Setup**:
+   - Navigate to the `/backend/database` folder.
+   - Execute the SQL scripts (`business_rule.sql` and `table.sql`) using MySQL Workbench to initialize the database schema and rules.
+
+2. **Backend API**:
+   - Navigate to the `backend/` folder.
+   - Run the following commands to install dependencies and start the backend server:
+     ```bash
+     npm install
+     node server.js
+     ```
+
+3. **Frontend**:
+   - Navigate to the `frontend/` folder.
+   - Run the following commands to install dependencies and start the frontend:
+     ```bash
+     npm install
+     npm start
+     ```
+
+---
+
+## Usage
+
+1. Ensure your local instances of MySQL and MongoDB are running.
+2. **Start API Server**:
+   - The backend will run at `http://localhost:5000/`.
+3. **Start Frontend**:
+   - The frontend will run at `http://localhost:3000/`.
+
+---
+
+## Video Demonstration
+
+Available at: [Link to Video]
+
+---
+
+## Contribution
+
+| SID      | Name                   | Role             |
+|:---------|:-----------------------|:-----------------|
+| s1234567 | Your Name               | Developer        |
+| s2345678 | Contributor Name 1      | Frontend Lead    |
+| s3456789 | Contributor Name 2      | Backend Lead     |
+| s4567890 | Contributor Name 3      | Database Design  |
+
+---
+
+## Developer Tools
+
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![VS Code](https://img.shields.io/badge/VS_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
+![Postman](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+![MySQL Workbench](https://img.shields.io/badge/MySQL_Workbench-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
+![MongoDB Compass](https://img.shields.io/badge/MongoDB_Compass-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
