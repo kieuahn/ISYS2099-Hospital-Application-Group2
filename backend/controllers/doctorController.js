@@ -7,7 +7,7 @@ const doctorViewUpcomingProceedingAppointment = async (req, res) => {
 
     try {
         const query = `SELECT appointment_id, purpose, status, start_time FROM appointments 
-        WHERE staff_id = ? AND (status = 'upcoming' OR status = 'proceeding')`;
+        WHERE staff_id = ? AND (status = 'upcoming' OR status = 'proceeding') AND start_time > NOW()`;
         const [appointments] = await poolDoctor.query(query, [doctor_id])
 
         if (appointments.length === 0) {
