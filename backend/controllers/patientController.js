@@ -63,7 +63,7 @@ const patientViewUpcomingProceedingAppointments = async (req, res) => {
     try {
         const query = `SELECT * FROM appointments 
                         WHERE patient_id = ? 
-                        AND (status LIKE "upcoming" OR status LIKE "proceeding");`
+                        AND (status LIKE "upcoming" OR status LIKE "proceeding") AND start_time > NOW();`
         const [appointments] = await poolPatient.query(query, [patient_id])
 
         if (appointments.length === 0) {
