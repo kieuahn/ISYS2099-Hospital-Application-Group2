@@ -68,7 +68,7 @@ A hospital management system designed to manage the activities and interactions 
 
 1. **MySQL Setup**:
    - Navigate to the `/backend/database` folder.
-   - Execute the SQL scripts (`business_rule.sql` and `table.sql`) using MySQL Workbench to initialize the database schema and rules.
+   - Execute the SQL scripts (`table.sql`,`business_rule.sql`,`view.sql`,`user.sql`,`mockdata.sql`) using MySQL Workbench to initialize the database schema and rules.
 
 2. **Backend API**:
    - Navigate to the `backend/` folder.
@@ -96,11 +96,31 @@ A hospital management system designed to manage the activities and interactions 
 3. **Start Frontend**:
    - The frontend will run at `http://localhost:3000/`.
 
+## Login Credentials
+
+1. Admin account
+Gmail : alice.johnson@hospital.com
+password : password1234
+
+2. Manager account
+Gmail : john.smith@hospital.com
+password : password1234
+
+3. Doctor account
+Gmail: emily.davis@hospital.com
+password: password1234
+
+4. Patient account
+Gmail: jane.doe@hospital.com
+password: password1234
+
 ---
 
 ## Video Demonstration
 
-Available at: [Link to Video]
+Available at
+[One Drive](https://rmiteduau-my.sharepoint.com/:v:/g/personal/s3927427_rmit_edu_vn/EZpJsSS1pAhOtaJ1wljldXEBpFskuKNPS54LRllp2oTc_w?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=H9qB5H)
+[Youtube](https://youtu.be/N3B1KBlxIsE)
 
 ---
 
