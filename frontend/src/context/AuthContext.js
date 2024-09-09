@@ -28,17 +28,6 @@ export const AuthProvider = ({ children }) => {
       const { role, name } = response.data; // Assuming the API returns role and name
       setAuth({ token, role, name });
 
-      // // Navigate based on role
-      // if (role === "doctor") {
-      //   navigate("/doctor/dashboard");
-      // } else if (role === "patient") {
-      //   navigate("/patient/dashboard");
-      // } else if (role === "admin" || role === "manager") {
-      //   navigate("/staff/dashboard"); // Combine route for both
-      //   navigate("/manager/dashboard");
-      // } else {
-      //   navigate("/error");
-      // }
       if (role === "doctor") {
         navigate("/doctor/dashboard");
       } else if (role === "patient") {

@@ -24,7 +24,7 @@ GRANT SELECT, INSERT ON staff_credentials TO 'shared_user'@'%';
 GRANT SELECT, INSERT, UPDATE ON staff TO 'shared_user'@'%';
 GRANT SELECT ON departments TO 'shared_user'@'%';
 GRANT SELECT ON doctor_schedules TO 'shared_user'@'%';
-GRANT SELECT ON appointments TO 'shared_user'@'%';
+GRANT SELECT (appointment_id, patient_id, staff_id, purpose, status, start_time, end_time) ON hospital_management.appointments TO 'shared_user'@'%';
 GRANT SELECT ON job_history TO 'shared_user'@'%';
 GRANT SELECT ON patients TO 'shared_user'@'%';
 GRANT SELECT ON treatments TO 'shared_user'@'%';
@@ -42,6 +42,8 @@ GRANT EXECUTE ON PROCEDURE UpdateStaffInfo TO 'shared_user'@'%';
 GRANT EXECUTE ON PROCEDURE GetPatientTreatmentHistory TO 'shared_user'@'%';
 GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'shared_user'@'%';
 GRANT EXECUTE ON PROCEDURE AddStaff TO 'shared_user'@'%';
+GRANT EXECUTE ON PROCEDURE GetAllDoctorsWorkload TO 'shared_user'@'%';
+
 
 -- ADMIN
 CREATE USER IF NOT EXISTS 'admin'@'%' IDENTIFIED BY 'password1234';
@@ -59,6 +61,8 @@ GRANT SELECT ON performance_rating TO 'admin'@'%';
 GRANT SELECT ON StaffDetails TO 'admin'@'%';
 GRANT SELECT ON StaffByDepartment TO 'admin'@'%';
 GRANT SELECT ON PatientDetails TO 'admin'@'%';
+GRANT SELECT ON PatientPaymentReport TO 'admin'@'%';
+
 
 GRANT EXECUTE ON PROCEDURE GetDoctorSchedules TO 'admin'@'%';
 GRANT EXECUTE ON PROCEDURE GetDoctorWorkload TO 'admin'@'%';
