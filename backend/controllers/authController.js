@@ -28,7 +28,6 @@ const login = async (req, res) => {
          }
 
          user = staffRows[0];
-         console.log("User found:", user);
          role = user.job_type; 
       }
 
@@ -43,10 +42,6 @@ const login = async (req, res) => {
          process.env.JWT_SECRET,
          { expiresIn: "5h" }
       );
-
-      // Log the role and token
-      console.log("Generated token:", token);
-      console.log("User role:", role);
 
       res.json({ token, role });
    } catch (error) {
