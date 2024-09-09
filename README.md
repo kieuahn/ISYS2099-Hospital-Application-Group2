@@ -1,5 +1,3 @@
-![header image](assets/header.jpg)
-
 # Hospital Management System - Group 2
 
 A hospital management system designed to manage the activities and interactions between admin, doctors, patients, and managers efficiently.
@@ -108,13 +106,13 @@ Available at: [Link to Video]
 
 ## Contribution
 
-| SID      | Name                   | Role             |
-|:---------|:-----------------------|:-----------------|
-| s1234567 | Your Name               | Developer        |
-| s2345678 | Contributor Name 1      | Frontend Lead    |
-| s3456789 | Contributor Name 2      | Backend Lead     |
-| s4567890 | Contributor Name 3      | Database Design  |
-
+| SID      | Name                     | Score |
+|:---------|:-------------------------|:----- |
+| s3818552 | Nguyen Ha Kieu Anh       | 5.75  |
+| s3927427 | Phan Le Quynh Anh        | 5.75  |
+| s3978175 | Nguyen Pham Tan Hau      | 2     |
+| s3938231 | Ong Gia Man              | 5.75  |
+| s3878520 | Vu Nguyet Minh           | 5.75  | 
 ---
 
 ## Developer Tools
