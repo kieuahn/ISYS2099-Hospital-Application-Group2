@@ -1,6 +1,6 @@
 USE hospital_management;
 
-drop view if exists get_doctors_list_available_slots;
+DROP VIEW IF EXISTS get_doctors_list_available_slots;
 -- Display to the get doctor's available slots
 CREATE VIEW get_doctors_list_available_slots AS
     SELECT 
@@ -17,7 +17,7 @@ CREATE VIEW get_doctors_list_available_slots AS
     WHERE
         s.job_type = 'Doctor' AND ds.availability_status = 'Available' AND (shift_start >= NOW());
         
-drop procedure if exists sp_book_appointment;
+DROP PROCEDURE IF EXISTS sp_book_appointment;
 -- PATIENT BOOK AN APPOINTMENT
 DELIMITER $$ 
 CREATE PROCEDURE sp_book_appointment(
@@ -47,11 +47,19 @@ IF EXISTS (SELECT 1 FROM appointments
 WHERE staff_id = doctorId
 AND start_time = formattedStart
 AND end_time = formattedEnd
-AND status = 'Upcoming')
+AND status = 'Upcoming' FOR UPDATE)
 THEN ROLLBACK; -- Rollback if there is a conflict
 SIGNAL SQLSTATE '45000' SET message_text = 'This timeslot is already booked. Please choose another timeslot';
 LEAVE this_proc;
 END IF;
+
+-- Lock the doctor’s schedule before making updates
+    SELECT availability_status 
+    FROM doctor_schedules 
+    WHERE staff_id = doctorId 
+    AND shift_start = formattedStart 
+    AND shift_end = formattedEnd
+    FOR UPDATE;
 
 -- Insert a new appointment
 INSERT INTO appointments (patient_id, staff_id, purpose, status, start_time, end_time, payment_amount)
@@ -82,7 +90,8 @@ END IF;
 END $$
 DELIMITER ;
 
-drop procedure if exists sp_cancel_appointment;
+
+DROP PROCEDURE IF EXISTS sp_cancel_appointment;
 -- PATIENT CANCEL APPOINTMENT
 DELIMITER $$
 CREATE PROCEDURE sp_cancel_appointment(
@@ -102,7 +111,7 @@ BEGIN
 
      -- Check if the appointment exists
     IF NOT EXISTS (SELECT 1 FROM appointments WHERE appointment_id = appointmentId FOR UPDATE) THEN
-        ROLLBACK;
+        -- ROLLBACK;
         SIGNAL SQLSTATE '45000' SET message_text = 'No appointment to cancel';
         LEAVE this_proc;
     END IF;
@@ -134,7 +143,7 @@ END IF;
 END $$
 DELIMITER ;
 
-drop procedure if exists sp_add_doctor_schedule;
+DROP PROCEDURE IF EXISTS sp_add_doctor_schedule;
 -- DOCTOR ADD NEW SCHEDULE
 DELIMITER $$
 CREATE PROCEDURE sp_add_doctor_schedule(
@@ -182,7 +191,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-drop procedure if exists sp_delete_doctor_schedule
+DROP PROCEDURE IF EXISTS sp_delete_doctor_schedule
 -- DELETE DOCTOR SCHEDULE
 DELIMITER $$
 CREATE PROCEDURE sp_delete_doctor_schedule (
@@ -244,5 +253,3 @@ BEGIN
 --     END IF;
 END $$
 DELIMITER ;
-
-
