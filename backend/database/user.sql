@@ -70,6 +70,8 @@ GRANT EXECUTE ON PROCEDURE UpdateStaffInfo TO 'admin'@'%';
 GRANT EXECUTE ON PROCEDURE GetPatientTreatmentHistory TO 'admin'@'%';
 GRANT EXECUTE ON PROCEDURE GetJobHistory TO 'admin'@'%';
 GRANT EXECUTE ON PROCEDURE AddStaff TO 'admin'@'%';
+GRANT EXECUTE ON PROCEDURE DeleteStaffByAdmin TO 'admin'@'%';
+
 
 -- DOCTOR
 CREATE USER IF NOT EXISTS 'doctor'@'%' IDENTIFIED BY 'password1234';
