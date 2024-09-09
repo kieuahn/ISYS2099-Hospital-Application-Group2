@@ -11,7 +11,7 @@ const {doctorViewUpcomingProceedingAppointment,
     doctorDeleteSchedule} = require("../controllers/doctorController");
 
 router.get("/upcoming-appointment", authMiddleware(["Doctor"]), doctorViewUpcomingProceedingAppointment);
-router.get("/past-appoinment", authMiddleware(["Doctor"]), doctorViewCompletedAppointment);
+router.get("/past-appointment", authMiddleware(["Doctor"]), doctorViewCompletedAppointment);
 router.get("/treatment-note/:appointment_id", authMiddleware(["Doctor"]), doctorViewTreatmentNote);
 router.post("/treatment/update/:treatment_id", authMiddleware(["Doctor"]), upload.single('diagnostic_image'), doctorUpdateTreatmentNote);
 router.get("/doctor-schedule", authMiddleware(["Doctor"]), viewDoctorSchedules);

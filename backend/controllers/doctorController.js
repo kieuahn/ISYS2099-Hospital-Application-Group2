@@ -164,8 +164,7 @@ const viewDoctorSchedules = async (req, res) => {
 const doctorAddSchedule = async (req, res) => {
     const doctorId = req.user.user_id;
     const {shiftStart, shiftEnd} = req.body;
-    console.log(doctorId);
-    console.log(shiftStart, shiftEnd)
+    
 
     try {
         const [result] = await poolDoctor.query('CALL sp_add_doctor_schedule(?, ?, ?)',

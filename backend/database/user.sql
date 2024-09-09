@@ -9,7 +9,7 @@ CREATE USER IF NOT EXISTS 'patient'@'%' IDENTIFIED BY 'password1234';
 GRANT SELECT, UPDATE ON hospital_management.patients TO 'patient'@'%';
 GRANT SELECT, INSERT, DELETE ON hospital_management.appointments TO 'patient'@'%';
 GRANT SELECT, INSERT, DELETE ON hospital_management.treatments TO 'patient'@'%';
-GRANT SELECT (staff_id, staff_name, department_id) ON hospital_management.staff TO 'patient'@'%';
+GRANT SELECT (staff_id, staff_name, department_id, job_type) ON hospital_management.staff TO 'patient'@'%';
 GRANT SELECT ON hospital_management.departments TO 'patient'@'%';
 GRANT SELECT ON hospital_management.doctor_schedules TO 'patient'@'%';
 GRANT SELECT ON hospital_management.get_doctors_list_available_slots TO 'patient'@'%';

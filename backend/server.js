@@ -25,7 +25,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth", authRoutes);
 app.use('/api',authMiddleware(['Admin', 'Manager', 'Doctor']), departmentRoutes);
 app.use("/api/staff", authMiddleware(['Admin', 'Manager']), staffRoutes); 
-app.use("/api/patient", authMiddleware(['Admin', 'Manager', 'Doctor']), patientRoutes); 
+app.use("/api/patient", authMiddleware(['Admin', 'Manager', 'Doctor', 'Patient']), patientRoutes); 
+app.use("/api/doctor", authMiddleware(['Dcotor']), doctorRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
