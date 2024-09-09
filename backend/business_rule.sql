@@ -47,11 +47,19 @@ IF EXISTS (SELECT 1 FROM appointments
 WHERE staff_id = doctorId
 AND start_time = formattedStart
 AND end_time = formattedEnd
-AND status = 'Upcoming')
+AND status = 'Upcoming' FOR UPDATE)
 THEN ROLLBACK; -- Rollback if there is a conflict
 SIGNAL SQLSTATE '45000' SET message_text = 'This timeslot is already booked. Please choose another timeslot';
 LEAVE this_proc;
 END IF;
+
+-- Lock the doctor’s schedule before making updates
+    SELECT availability_status 
+    FROM doctor_schedules 
+    WHERE staff_id = doctorId 
+    AND shift_start = formattedStart 
+    AND shift_end = formattedEnd
+    FOR UPDATE;
 
 -- Insert a new appointment
 INSERT INTO appointments (patient_id, staff_id, purpose, status, start_time, end_time, payment_amount)
@@ -82,6 +90,7 @@ END IF;
 END $$
 DELIMITER ;
 
+
 drop procedure if exists sp_cancel_appointment;
 -- PATIENT CANCEL APPOINTMENT
 DELIMITER $$
@@ -102,7 +111,7 @@ BEGIN
 
      -- Check if the appointment exists
     IF NOT EXISTS (SELECT 1 FROM appointments WHERE appointment_id = appointmentId FOR UPDATE) THEN
-        ROLLBACK;
+        -- ROLLBACK;
         SIGNAL SQLSTATE '45000' SET message_text = 'No appointment to cancel';
         LEAVE this_proc;
     END IF;
@@ -244,5 +253,3 @@ BEGIN
 --     END IF;
 END $$
 DELIMITER ;
-
-
