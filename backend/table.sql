@@ -1,4 +1,3 @@
--- DROP database hospital_management;
 -- Create the Hospital Management Database
 CREATE DATABASE hospital_management;
 USE hospital_management;
@@ -14,10 +13,6 @@ DROP TABLE IF EXISTS staff_credentials;
 DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS patients;
 DROP TABLE IF EXISTS patient_credentials;
-DROP TABLE IF EXISTS staff_credentials;
-
-
--- Patient table-- 
 
 -- Patients Table
 CREATE TABLE patients (
@@ -87,6 +82,12 @@ REFERENCES departments(department_id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
+ALTER TABLE staff 
+ADD CONSTRAINT fk_manager_id 
+FOREIGN KEY (manager_id)
+REFERENCES staff(staff_id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- Staff Credentials Table
 CREATE TABLE staff_credentials (
@@ -148,10 +149,6 @@ CREATE TABLE treatments (
     medication VARCHAR(225),
     instruction VARCHAR(500)
 ) ENGINE=INNODB;
-
-ALTER TABLE treatments 
-ADD CONSTRAINT uq_treatments_appointment_id 
-UNIQUE (appointment_id);
 
 ALTER TABLE treatments 
 ADD CONSTRAINT fk_treatment_appointment 
