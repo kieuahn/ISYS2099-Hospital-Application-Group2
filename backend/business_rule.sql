@@ -1,6 +1,6 @@
 USE hospital_management;
 
-drop view if exists get_doctors_list_available_slots;
+DROP VIEW IF EXISTS get_doctors_list_available_slots;
 -- Display to the get doctor's available slots
 CREATE VIEW get_doctors_list_available_slots AS
     SELECT 
@@ -17,7 +17,7 @@ CREATE VIEW get_doctors_list_available_slots AS
     WHERE
         s.job_type = 'Doctor' AND ds.availability_status = 'Available' AND (shift_start >= NOW());
         
-drop procedure if exists sp_book_appointment;
+DROP PROCEDURE IF EXISTS sp_book_appointment;
 -- PATIENT BOOK AN APPOINTMENT
 DELIMITER $$ 
 CREATE PROCEDURE sp_book_appointment(
@@ -91,7 +91,7 @@ END $$
 DELIMITER ;
 
 
-drop procedure if exists sp_cancel_appointment;
+DROP PROCEDURE IF EXISTS sp_cancel_appointment;
 -- PATIENT CANCEL APPOINTMENT
 DELIMITER $$
 CREATE PROCEDURE sp_cancel_appointment(
@@ -143,7 +143,7 @@ END IF;
 END $$
 DELIMITER ;
 
-drop procedure if exists sp_add_doctor_schedule;
+DROP PROCEDURE IF EXISTS sp_add_doctor_schedule;
 -- DOCTOR ADD NEW SCHEDULE
 DELIMITER $$
 CREATE PROCEDURE sp_add_doctor_schedule(
@@ -191,7 +191,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-drop procedure if exists sp_delete_doctor_schedule
+DROP PROCEDURE IF EXISTS sp_delete_doctor_schedule
 -- DELETE DOCTOR SCHEDULE
 DELIMITER $$
 CREATE PROCEDURE sp_delete_doctor_schedule (
