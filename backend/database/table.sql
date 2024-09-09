@@ -13,10 +13,6 @@ DROP TABLE IF EXISTS staff_credentials;
 DROP TABLE IF EXISTS staff;
 DROP TABLE IF EXISTS patients;
 DROP TABLE IF EXISTS patient_credentials;
-DROP TABLE IF EXISTS staff_credentials
-
-
--- Patient table-- 
 
 -- Patients Table
 CREATE TABLE patients (
@@ -86,6 +82,12 @@ REFERENCES departments(department_id)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
 
+ALTER TABLE staff 
+ADD CONSTRAINT fk_manager_id 
+FOREIGN KEY (manager_id)
+REFERENCES staff(staff_id)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
 
 -- Staff Credentials Table
 CREATE TABLE staff_credentials (
@@ -149,10 +151,6 @@ CREATE TABLE treatments (
 ) ENGINE=INNODB;
 
 ALTER TABLE treatments 
-ADD CONSTRAINT uq_treatments_appointment_id 
-UNIQUE (appointment_id);
-
-ALTER TABLE treatments 
 ADD CONSTRAINT fk_treatment_appointment 
 FOREIGN KEY (appointment_id) 
 REFERENCES appointments(appointment_id)
@@ -208,35 +206,6 @@ CREATE TABLE performance_rating (
     appointment_id INT NOT NULL,
     performance_rating DECIMAL(3, 2) NOT NULL
 ) ENGINE=InnoDB;
-
--- Patient credentials table
-CREATE TABLE patient_credentials (
-    patient_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    patient_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
-) ENGINE=InnoDB;
-
--- Staff credentials table
-CREATE TABLE staff_credentials (
-    staff_credentials_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    staff_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('doctor', 'manager', 'admin') NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (staff_id) REFERENCES staffs(staff_id)
-) ENGINE=InnoDB;
-
--- departments table
-CREATE TABLE departments (
-    department_id INT AUTO_INCREMENT PRIMARY KEY,
-    department_name VARCHAR(100) NOT NULL
-)
 
 ALTER TABLE performance_rating 
 ADD CONSTRAINT uq_appointment_id 

@@ -1,4 +1,5 @@
-const mysql = require("../config/db")
+const {poolPatient} = require("../config/db")
+const treatmentDetails = require("../models/treatmentDetails")
 
 
 // Patient view their profile
@@ -8,7 +9,7 @@ const getPatientProfile = async (req, res) => {
         const patient_id = req.user.user_id;
 
         const query = 'SELECT * FROM patients WHERE patient_id = ?';
-        const [patient] = await mysql.promise().query(query, [patient_id]); // Retrieve the patient from table Patient
+        const [patient] = await poolPatient.query(query, [patient_id]); // Retrieve the patient from table Patient
 
         // Check if the query statement return any row
         if (patient.length === 0) {
@@ -41,9 +42,9 @@ const editPatientProfile = async (req, res) => {
         }
 
         const query = `UPDATE patients 
-                    SET patient_name = ?, allergies = ?, contact_number = ?, date_of_birth = ?, gender = ?, address = ?
+                    SET patient_name = ?, allergies = ?, contact_number = ?, dob = ?, gender = ?, address = ?
                     WHERE patient_id = ?`
-        const [result] = await mysql.promise().query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id])
+        const [result] = await poolPatient.query(query, [name, allergies, contact_number, date_of_birth, gender, address, patient_id])
 
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "Cannot update patient's profile" })
@@ -62,8 +63,8 @@ const patientViewUpcomingProceedingAppointments = async (req, res) => {
     try {
         const query = `SELECT * FROM appointments 
                         WHERE patient_id = ? 
-                        AND (status LIKE "upcoming" OR status LIKE "proceeding");`
-        const [appointments] = await mysql.promise().query(query, [patient_id])
+                        AND (status LIKE "upcoming" OR status LIKE "proceeding") AND start_time > NOW();`
+        const [appointments] = await poolPatient.query(query, [patient_id])
 
         if (appointments.length === 0) {
             return res.status(200).json({ message: "No upcoming appointment yet" })
@@ -85,7 +86,7 @@ const patientViewHistoryAppointments = async (req, res) => {
         const query = `SELECT * FROM appointments 
                         WHERE patient_id = ? 
                         AND (status LIKE "completed" OR status LIKE "cancelled");`
-        const [appointments] = await mysql.promise().query(query, [patient_id])
+        const [appointments] = await poolPatient.query(query, [patient_id])
 
         if (appointments.length === 0) {
             return res.status(200).json({ message: "No past appointment" })
@@ -104,9 +105,9 @@ const patientViewTreatmentList = async (req, res) => {
     const patient_id = req.user.user_id;
 
     try {
-        const query = `SELECT treatment_id, patient_id, appointment_id, diagnosis, treatment_date FROM treatment_notes 
+        const query = `SELECT treatment_id, patient_id, appointment_id, diagnosis, treatment_date FROM treatments 
                         WHERE patient_id = ?;`
-        const [treatments] = await mysql.promise().query(query, [patient_id])
+        const [treatments] = await poolPatient.query(query, [patient_id])
 
         if (treatments.length === 0) {
             return res.status(200).json({ message: "No past treatment" })
@@ -120,21 +121,36 @@ const patientViewTreatmentList = async (req, res) => {
     }
 }
 
-// Patient view each treatment's note
+// Patient view each treatment's note - Include mongodb data
 const patientViewTreatmentNote = async (req, res) => {
     const patient_id = req.user.user_id;
     const appointment_id = req.params.appointment_id;
-    
+
     try {
-        const query = `SELECT * FROM treatment_notes  
+        const query = `SELECT * FROM treatments  
             WHERE appointment_id = ? AND patient_id = ?`
 
-        const [notesList] = await mysql.promise().query(query, [appointment_id, patient_id])
+        const [notesList] = await poolPatient.query(query, [appointment_id, patient_id])
         if (notesList.length === 0) {
             return res.status(200).json({ message: "No treatments yet" })
         }
+        const treatment = notesList[0];  // Extract the treatment record
 
-        return res.status(200).json(notesList[0])
+        // Query MongoDB for additional treatment details using treatment_id
+        const treatmentDetailRecord = await treatmentDetails.findOne({ treatment_id: treatment.treatment_id });
+
+        // If no Mongodb data found, return only MySQL treatment data
+        if (!treatmentDetailRecord) {
+            return res.status(200).json(treatment);
+        }
+
+        // Combine MySQL treatment data with MongoDB treatment details
+        const combinedResult = {
+            ...treatment,  // MySQL treatment data
+            ...treatmentDetailRecord._doc  // MongoDB treatment details
+        };
+
+        return res.status(200).json(combinedResult);
     }
     catch (err) {
         console.error("Error: ", err.stack);
@@ -143,26 +159,110 @@ const patientViewTreatmentNote = async (req, res) => {
 }
 
 // Patient view doctor list
-// Retreive data for the scheduling of appointment to render the booking appointment form 
-// use 
-const viewDoctorList = async (req, res) => {
+// Retrieve data for the scheduling of appointment to render the booking appointment form 
+const patientViewDoctorList = async (req, res) => {
+    query = `SELECT s.staff_id, s.staff_name, d.department_name 
+    FROM staff s JOIN departments d ON s.department_id = d.department_id
+    WHERE job_type = 'Doctor';`
 
+    try {
+        [doctorRows] = await poolPatient.query(query)
+
+        return res.status(200).json(doctorRows)
+    }
+    catch (err) {
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message })
+    }
+}
+
+// Patient view doctor's booking form with available slots by date
+// Patient can view the time slot like this "startTime - endTime"
+// localhost:5000/api/patient/booking-form/3?date=2024-09-06
+const patientViewDoctorBookingForm = async (req, res) => {
+    const { date } = req.query;  // Get the date from query parameters
+    const doctor_id = req.params.doctor_id;  
+
+    try {
+        const [slots] = await poolPatient.query('SELECT * FROM get_doctors_list_available_slots WHERE staff_id = ? AND date = ?', [doctor_id, date]);
+
+        return res.status(200).json(slots)
+    }
+    catch (err) {
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message })
+    }
 }
 
 // Book appointment & create new appointment note (patient treatment at the same time)
+// Assume the type of time returned is HH:mm - HH:mm (eg: 9.00 - 10:00)
 // Use transaction
-const bookAppointment = async (req, res) => {
-    const patient_id = req.user.patient_id;
-    const doctor_id = req.params.staff_id;
+const patientBookAppointment = async (req, res) => {
+    const patient_id = req.user.user_id;
+    const doctor_id = req.params.doctor_id;
+    const {timeRange, purpose, appointment_date, patient_note } = req.body;
 
+    const [start_time, end_time] = timeRange.split(' - ').map(time => time.trim());
+    try {
+        const [bookingResult] = await poolPatient.query(
+            'CALL sp_book_appointment(?, ?, ?, ?, ?, ?, @treatmentId)',
+            [patient_id, doctor_id, purpose, appointment_date, start_time, end_time]
+        );
+        console.log(bookingResult);
+
+        // Check if there is any error from the stored procedure (SIGNAL SQLSTATE)
+        if (bookingResult && bookingResult.length > 0 && bookingResult[0][0].message_text) {
+            throw new Error(bookingResult[0][0].message_text);
+        }
+
+        // Extract treatmentId from output parameter from the sp_book_appointment
+        const [[{ treatmentId }]] = await poolPatient.query('SELECT @treatmentId AS treatmentId');
+        
+        if (treatmentId === 0) {
+            return res.status(400).json({ message: 'Failed to book appointment. Treatment ID is 0.' });
+        }
+
+        // Create a new document in MongoDB with the extracted treatmentId
+        await treatmentDetails.create({ treatment_id: treatmentId, patient_note: patient_note});
+
+
+        return res.status(200).json({message: 'Appointment booked successfully'})
+    }
+    catch (err) {
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message }) // Handle all errors including from the stored pro
+    }
 
 }
 
 // Patient cancel an appointment, delete the patient note at the same time because the appointment has yet
 // has yet to happen 
 // use transaction
-const cancelAppointment = async (req, res) => {
+const patientCancelAppointment = async (req, res) => {
     const appointment_id = req.params.appointment_id;
+
+    try {
+        const [cancelResult] = await poolPatient.query('CALL sp_cancel_appointment(?, @treatmentId)',
+            appointment_id
+        )
+
+        // Check if there is any error from the stored procedure (SIGNAL SQLSTATE)
+        if (cancelResult && cancelResult.length > 0 && cancelResult[0][0].message_text) {
+            throw new Error(cancelResult[0][0].message_text);
+        }
+
+        // Extract treatmentId from output parameter from the sp_book_appointment
+        const [[{ treatmentId }]] = await poolPatient.query('SELECT @treatmentId AS treatmentId');
+
+        // Delete treatment details
+        await treatmentDetails.deleteOne({ treatment_id: treatmentId });
+
+        return res.status(200).json({message: 'Appoinment Cancelled'})
+    }
+    catch (err) {
+        console.error("Error: ", err.stack);
+        return res.status(500).json({ error: err.message }) // Handle all errors including from the stored pro
+    }
 }
 
 module.exports = {
@@ -171,5 +271,9 @@ module.exports = {
     patientViewUpcomingProceedingAppointments,
     patientViewHistoryAppointments,
     patientViewTreatmentList,
-    patientViewTreatmentNote
+    patientViewTreatmentNote,
+    patientViewDoctorList,
+    patientViewDoctorBookingForm,
+    patientBookAppointment,
+    patientCancelAppointment
 }

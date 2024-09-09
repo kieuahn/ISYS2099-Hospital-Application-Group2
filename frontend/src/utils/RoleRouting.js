@@ -3,29 +3,27 @@ import { Navigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import PatientDashboard from "../pages/patient/PatientDashboard";
 import DoctorDashboard from "../pages/DoctorDashboard";
-import ManagerDashboard from "../pages/ManagerDashboard";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import ErrorPage from "../pages/ErrorPage"
+import StaffDashboard from "../pages/Staff/StaffDashboard";
+import ErrorPage from "../pages/ErrorPage";
 
 const RoleRouting = () => {
   const { auth } = useContext(AuthContext);
 
   if (!auth) {
-    // If the user is not authenticated, redirect to the login page
     return <Navigate to="/login" />;
   }
+
   console.log("Authenticated Role:", auth.role);
 
   // Redirect based on role
   switch (auth.role) {
-    case "patient":
+    case "Patient":
       return <PatientDashboard />;
-    case "doctor":
+    case "Doctor":
       return <DoctorDashboard />;
-    case "manager":
-      return <ManagerDashboard />;
-    case "admin":
-      return <AdminDashboard />;
+    case "Manager":
+    case "Admin":
+      return <StaffDashboard />;  // Combined Dashboard for Admin and Manager
     default:
       return <ErrorPage />;
   }

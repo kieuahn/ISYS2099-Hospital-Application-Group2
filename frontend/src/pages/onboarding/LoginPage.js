@@ -1,10 +1,27 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
+  const { login, auth } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (auth) {
+      // Redirect based on role if the user is already logged in
+      if (auth.role === 'admin') {
+        navigate('/dashboard/admin');
+      } else if (auth.role === 'doctor') {
+        navigate('/dashboard/doctor');
+      } else if (auth.role === 'manager') {
+        navigate('/dashboard/manager');
+      } else if (auth.role === 'patient') {
+        navigate('/dashboard/patient');
+      }
+    }
+  }, [auth, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

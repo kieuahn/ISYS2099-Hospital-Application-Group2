@@ -1,22 +1,37 @@
-const mysql = require("mysql2");
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "admin",
-  database: "hospital_management"
+require('dotenv').config();
+const mysql = require('mysql2/promise');
+
+const poolPatient = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_PATIENT_USER,
+  password: process.env.MYSQL_PATIENT_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 });
 
-// host: process.env.MYSQL_HOST,
-// user: process.env.MYSQL_USER,
-// password: process.env.MYSQL_PASSWORD,
-// database: process.env.MYSQL_DATABASE
-
-connection.connect((err) => {
-  if (err) {
-    console.error("Error connecting to MySQL:", err);
-  } else {
-    console.log("Connected to MySQL");
-  }
+const poolShare = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_SHARED_USER,
+  password: process.env.MYSQL_SHARED_PASSWORD,
+  database: process.env.MYSQL_DATABASE
 });
 
-module.exports = connection;
+const poolAdmin = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_ADMIN_USER,
+  password: process.env.MYSQL_ADMIN_PASSWORD,
+  database: process.env.MYSQL_DATABASE
+});
+
+const poolDoctor = mysql.createPool({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_DOCTOR_USER,
+  password: process.env.MYSQL_DOCTOR_PASSWORD,
+  database: process.env.MYSQL_DATABASE
+});
+
+module.exports = {
+  poolPatient,
+  poolDoctor,
+  poolShare,
+  poolAdmin
+};
