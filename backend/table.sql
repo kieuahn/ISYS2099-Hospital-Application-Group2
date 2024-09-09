@@ -1,3 +1,4 @@
+-- DROP database hospital_management;
 -- Create the Hospital Management Database
 CREATE DATABASE hospital_management;
 USE hospital_management;
